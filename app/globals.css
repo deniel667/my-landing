@@ -1,26 +1,200 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* === Copied from index.html <style> === */
+.writing-vertical {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hairline {
+            border-width: 1px;
+        }
+        @media (min-resolution: 2dppx) {
+            .hairline {
+                border-width: 0.5px;
+            }
+        }
+        .glass-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Hero gradient background */
+        .hero-gradient {
+            background: linear-gradient(180deg, #F2F0EB 0%, #FAFAF8 50%, #F2F0EB 100%);
+        }
+        
+        /* Premium fade-in */
+        .fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+            transform: translateY(12px);
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        
+        /* Chapter navigation */
+        .chapter-nav-item {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chapter-nav-item.active {
+            color: #8C7B6C;
+            border-left-color: #8C7B6C;
+            padding-left: 1.25rem;
+        }
+        
+        /* Scroll reveal */
+        .chapter-block {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chapter-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Premium button hover */
+        .premium-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: currentColor;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-btn:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        /* Arrow motion */
+        .arrow-motion {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .premium-btn:hover .arrow-motion {
+            transform: translateX(4px);
+        }
+        
+        /* Service card hover */
+        .service-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .service-card:hover {
+            transform: translateY(-2px);
+            border-color: #8C7B6C;
+        }
+        
+        /* Fade-in blocks for new sections */
+        .fade-in-block {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1), transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fade-in-block.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* VDP pyramid hover */
+        .vdp-tier {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .vdp-tier:hover {
+            background: #EBE8E3;
+            border-color: #8C7B6C;
+        }
+        
+        /* Scroll cue animation */
+        @keyframes scrollCue {
+            0%, 100% { transform: translateY(0); opacity: 1; }
+            50% { transform: translateY(8px); opacity: 0.6; }
+        }
+        .scroll-cue {
+            animation: scrollCue 2s ease-in-out infinite;
+        }
+        
+        /* Winery list-card hover */
+        .winery-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .winery-card:hover {
+            transform: translateY(-1px);
+            border-color: #8C7B6C;
+        }
+        .winery-card.selected {
+            border-color: #8C7B6C;
+            background: #FAFAF8;
+        }
+        
+        /* Winery drawer slide-in */
+        .drawer {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .drawer.open {
+            transform: translateX(0);
+        }
+        
+        /* Wine card expand */
+        .wine-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .wine-card:hover {
+            border-color: #8C7B6C;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .chapter-block {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+            .scroll-cue {
+                animation: none !important;
+            }
+        }
+        
+        /* Section rhythm */
+        .section-padding {
+            padding-top: 7rem;
+            padding-bottom: 7rem;
+        }
+        @media (min-width: 768px) {
+            .section-padding {
+                padding-top: 8rem;
+                padding-bottom: 8rem;
+            }
+        }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/* === End copied styles === */
