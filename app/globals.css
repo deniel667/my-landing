@@ -10,13 +10,12 @@
   --bg-cream: var(--bg);
   --hairline: var(--line);
 
-  --font-default: YuGothic, "Yu Gothic", "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
-  --font-primary: "あおとゴシック R", var(--font-noto-sans), var(--font-default);
-  --font-primary-b: "あおとゴシック B", var(--font-noto-sans), var(--font-default);
-  --font-jp: "FOT-筑紫Aオールド明朝 Pr6 M", var(--font-jp-display), var(--font-jp-alt), "Hiragino Mincho ProN", "Yu Mincho", serif;
-  --font-jp2: "秀英角ゴシック銀 B", var(--font-primary);
-  --font-en2: var(--font-montserrat), "Montserrat", sans-serif;
-  --font-heading: var(--font-noto-serif-jp), var(--font-jp);
+  --font-default: var(--font-noto-sans), "Noto Sans JP", system-ui, sans-serif;
+  --font-primary: var(--font-default);
+  --font-primary-b: var(--font-default);
+  --font-jp2: var(--font-primary);
+  --font-en2: var(--font-primary);
+  --font-heading: var(--font-noto-serif-jp), "Noto Serif JP", serif;
   --font-body: var(--font-primary);
 
   --tone-base: var(--bg);
@@ -3309,7 +3308,7 @@ body {
 
 #contact .next-step-title-line {
   display: block;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 #contact .next-step-eyebrow + .next-step-title {
@@ -8706,6 +8705,7 @@ body #hero.hero-noren .hero-barrel-layer {
 }
 
 .aboutLead .h2 {
+  font-family: var(--font-heading);
   font-size: clamp(26px, 3vw, 40px);
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -8715,6 +8715,7 @@ body #hero.hero-noren .hero-barrel-layer {
 
 .aboutTitleLine {
   display: block;
+  white-space: normal;
 }
 
 .aboutLead .p {
