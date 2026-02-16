@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
+    "dev:webpack": "next dev --webpack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "backup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup.ps1",
+    "backup:keep10": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/backup.ps1 -Keep 10"
   },
   "dependencies": {
     "next": "16.1.6",
@@ -24,3 +27,4 @@
     "typescript": "^5"
   }
 }
+
