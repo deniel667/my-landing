@@ -9317,6 +9317,20 @@ button.cta-button,
   max-width: 240px !important;
 }
 
+@media (min-width: 1024px) {
+  #foundation .foundation-cta-wrap {
+    width: auto !important;
+    justify-items: start !important;
+  }
+
+  #foundation .foundation-cta-button {
+    width: auto !important;
+    min-width: 168px !important;
+    max-width: none !important;
+    padding-inline: 16px !important;
+  }
+}
+
 /* Contact form interactive states parity */
 #contact .input,
 #contact .selectTrigger,
