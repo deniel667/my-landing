@@ -8830,3 +8830,85 @@ body #hero.hero-noren .hero-barrel-layer {
   border-color: rgba(210, 180, 120, 0.22) !important;
   background: rgba(210, 180, 120, 0.07) !important;
 }
+
+/* Final responsive pass */
+@media (max-width: 1023px) {
+  #philosophy .editorial-side-flow.editorial-side-sticky,
+  #noren-network .editorial-side-flow.editorial-side-sticky,
+  #rare .trust-vdp-module.trust-vdp-dark-band,
+  #rare .trust-vdp-module {
+    position: static !important;
+    top: auto !important;
+  }
+
+  #contact .next-step-grid {
+    grid-template-columns: 1fr !important;
+    gap: 18px !important;
+  }
+
+  #contact .next-step-title {
+    max-width: 100% !important;
+  }
+
+  #contact .next-step-title-line {
+    white-space: normal !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body {
+    overflow-x: clip;
+  }
+
+  .nav-inner {
+    min-height: 62px;
+  }
+
+  .brand-sub {
+    display: none;
+  }
+
+  .section.about .aboutContent::before {
+    display: none;
+  }
+
+  .axisRow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .axisName {
+    white-space: normal;
+  }
+
+  #contact .contactSection {
+    padding: 52px 0;
+  }
+
+  #contact .contactInner {
+    padding: 0 16px;
+  }
+
+  #contact .panelActions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #contact .btnPrimary,
+  #contact .btnGhost {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bridgeCard {
+    width: min(560px, calc(100vw - 32px));
+    border-radius: 16px;
+    line-height: 1.45;
+  }
+
+  .hero-barrel-layer,
+  .hero-barrel-fade-layer {
+    display: none !important;
+  }
+}

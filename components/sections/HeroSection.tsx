@@ -40,6 +40,7 @@ export default function HeroSection({ data }: Props) {
       />
       <span
         aria-hidden="true"
+        className="hero-barrel-fade-layer"
         style={{
           position: 'absolute',
           top: 0,
