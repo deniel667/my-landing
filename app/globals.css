@@ -9216,34 +9216,47 @@ button.cta-button,
   }
 }
 
-/* CTA full-width (requested) */
-.hero-actions,
-.trust-cta-row,
-.voice-cta-row,
-.service-cta-row,
-#contact .next-step-cta-row,
-#contact .panelActions {
-  display: grid !important;
-  grid-template-columns: 1fr !important;
-  width: 100% !important;
-  gap: 10px !important;
+/* CTA full-width only on mobile */
+@media (max-width: 767px) {
+  .hero-actions,
+  .trust-cta-row,
+  .voice-cta-row,
+  .service-cta-row,
+  #contact .next-step-cta-row,
+  #contact .panelActions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .hero-actions .cta-button,
+  .trust-cta-row .cta-button,
+  .voice-cta-row .cta-button,
+  .service-cta-row .cta-button,
+  #contact .next-step-cta-row .cta-button,
+  #contact .panelActions .btnPrimary,
+  #contact .panelActions .btnGhost {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #hero .hero-action-primary,
+  #hero .hero-action-secondary {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
 }
 
-.hero-actions .cta-button,
-.trust-cta-row .cta-button,
-.voice-cta-row .cta-button,
-.service-cta-row .cta-button,
-#contact .next-step-cta-row .cta-button,
-#contact .panelActions .btnPrimary,
-#contact .panelActions .btnGhost {
-  width: 100% !important;
-  min-width: 0 !important;
-}
+@media (min-width: 768px) {
+  #hero .hero-action-primary {
+    width: 196px !important;
+    min-width: 196px !important;
+  }
 
-#hero .hero-action-primary,
-#hero .hero-action-secondary {
-  width: 100% !important;
-  min-width: 0 !important;
+  #hero .hero-action-secondary {
+    width: auto !important;
+  }
 }
 
 /* VDP: numbers strictly left, cards equal width */
