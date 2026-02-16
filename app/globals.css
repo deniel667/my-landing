@@ -9271,3 +9271,13 @@ button.cta-button,
   width: 100% !important;
   margin: 0 !important;
 }
+
+/* Foundation (president block): wide CTA */
+#foundation .foundation-cta-wrap {
+  width: 100%;
+}
+
+#foundation .foundation-cta-button {
+  width: 100% !important;
+  min-width: 0 !important;
+}
