@@ -69,7 +69,7 @@ export default function VoiceSection() {
       <div className="grid12 voice-main-grid">
         <header className="voice-head section-cap section-reveal reveal-delay-0">
           <p className="voice-eyebrow">VOICE / 現場の声</p>
-          <h2 className="voice-title">導入店舗・体験者の声</h2>
+          <h2 className="voice-title break-keep hyphens-none [text-wrap:balance]">導入店舗・体験者の声</h2>
           <p className="voice-desc">導入後の現場で実感された変化をご紹介します。</p>
 
           <div className="voice-cta-row">

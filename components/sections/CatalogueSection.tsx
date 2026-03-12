@@ -1,18 +1,21 @@
 ﻿'use client';
 
+import { docWineData, type DocWine } from '@/data/my-landing/docWineData';
 import Image from 'next/image';
-import { useState } from 'react';
-import WineryDrawer, { type WineryDrawerWinery, type WineryWine } from '../winery/WineryDrawer';
+import { type WineryDrawerWinery, type WineryWine } from '../winery/WineryDrawer';
 
 type WineryCard = WineryDrawerWinery & {
   style: string;
   count: string;
+  blurb1: string;
+  blurb2: string;
+  rising: string;
   keywords?: string;
   cardTitle?: string;
   cardCaption?: string[];
   photo: string;
   imageClass: string;
-  href: string;
+  ideelogosUrl?: string;
 };
 
 const buildWines = (base: {
@@ -43,16 +46,345 @@ const buildWines = (base: {
   ];
 };
 
+const docTypeMap: Record<DocWine['type'], WineryWine['type']> = {
+  white: '白',
+  red: '赤',
+  sparkling: '泡',
+};
+
+const metricsByType: Record<WineryWine['type'], WineryWine['metrics']> = {
+  白: { dryness: 4, acid: 4, bubbles: 3 },
+  赤: { dryness: 4, acid: 3, bubbles: 4 },
+  泡: { dryness: 4, acid: 4, bubbles: 5 },
+};
+
+function normalizeDocText(value: string): string {
+  return value.replace(/[─]{5,}/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeWineName(value: string): string {
+  const base = normalizeDocText(value);
+  const replacements: Array<[RegExp, string]> = [
+    [/CabernetSauvignon/g, 'Cabernet Sauvignon'],
+    [/SpätburgunderLangeGoldkapsel/g, 'Spätburgunder Lange Goldkapsel'],
+    [/Spätburgundertrocken/g, 'Spätburgunder trocken'],
+    [/Dornfeldertrocken/g, 'Dornfelder trocken'],
+    [/Rieslingtrocken/g, 'Riesling trocken'],
+    [/Silvanertrocken/g, 'Silvaner trocken'],
+    [/Chardonnaytrocken/g, 'Chardonnay trocken'],
+    [/Rieslingdry/g, 'Riesling dry'],
+    [/SauvignonBlanc/g, 'Sauvignon Blanc'],
+    [/Sauvignonblanc/g, 'Sauvignon Blanc'],
+    [/Blanctrocken/g, 'Blanc trocken'],
+    [/blanctrocken/g, 'Blanc trocken'],
+    [/BlancdeNoir/g, 'Blanc de Noir'],
+    [/Goldmuskatellerfeinherb/g, 'Goldmuskateller feinherb'],
+    [/GrauburgunderGutsweintrocken/g, 'Grauburgunder Gutswein trocken'],
+    [/WeissburgunderGutsweintrocken/g, 'Weissburgunder Gutswein trocken'],
+    [/SilvanerbrutSektb\.A\./g, 'Silvaner brut Sekt b.A.'],
+    [/RieslingSektBrut/g, 'Riesling Sekt Brut'],
+    [/EscherndorfSilvanertrocken/g, 'Escherndorf Silvaner trocken'],
+    [/EscherndorfSilvaner/g, 'Escherndorf Silvaner'],
+    [/ThörnicherRiesling/g, 'Thörnicher Riesling'],
+    [/ThörnicherRitschRiesling/g, 'Thörnicher Ritsch Riesling'],
+    [/WinkelDachsbergRiesling/g, 'Winkel Dachsberg Riesling'],
+    [/RheingauRieslingtrocken/g, 'Rheingau Riesling trocken'],
+    [/RheingauRieslingfeinherb/g, 'Rheingau Riesling feinherb'],
+    [/WinkelRieslingAlteRebenfeinherb/g, 'Winkel Riesling Alte Reben feinherb'],
+    [/WinkelDachsbergRieslingtrocken/g, 'Winkel Dachsberg Riesling trocken'],
+    [/WinkelRieslingAlteReben/g, 'Winkel Riesling Alte Reben'],
+    [/RheingauRiesling/g, 'Rheingau Riesling'],
+    [/HattenheimerNussbrunnenRiesling/g, 'Hattenheimer Nussbrunnen Riesling'],
+    [/RüdesheimBergRottlandRiesling/g, 'Rüdesheim Berg Rottland Riesling'],
+    [/MayschosserMönchbergSpätburgunder/g, 'Mayschosser Mönchberg Spätburgunder'],
+    [/RecherHerrenbergSpätburgunder/g, 'Recher Herrenberg Spätburgunder'],
+    [/DernauerHardtbergSpätburgunder/g, 'Dernauer Hardtberg Spätburgunder'],
+    [/NeuenahrerSonnenbergSpätburgunder/g, 'Neuenahrer Sonnenberg Spätburgunder'],
+    [/AhrweilerRosenthalSpätburgunder/g, 'Ahrweiler Rosenthal Spätburgunder'],
+    [/BönnigheimChardonnay/g, 'Bönnigheim Chardonnay'],
+    [/KaiserstuhlSpätburgunder/g, 'Kaiserstuhl Spätburgunder'],
+    [/WachenheimerRiesling/g, 'Wachenheimer Riesling'],
+    [/RuppertsbergerRiesling/g, 'Ruppertsberger Riesling'],
+    [/ForsterRiesling/g, 'Forster Riesling'],
+    [/DeidesheimerRiesling/g, 'Deidesheimer Riesling'],
+    [/DeidesheimRiesling/g, 'Deidesheim Riesling'],
+    [/Leiselheim Chardonnay trocken -SchwarzeErde-/g, 'Leiselheim Chardonnay trocken - Schwarze Erde -'],
+    [/In derHölle/g, 'In der Hölle'],
+    [/Sektb\.A\./g, 'Sekt b.A.'],
+    [/QbAtrocken/g, 'QbA trocken'],
+  ];
+
+  let name = base;
+  replacements.forEach(([pattern, next]) => {
+    name = name.replace(pattern, next);
+  });
+
+  name = name
+    .replace(/([A-Za-zÄÖÜäöüß])trocken\b/g, '$1 trocken')
+    .replace(/([A-Za-zÄÖÜäöüß])feinherb\b/g, '$1 feinherb')
+    .replace(/([A-Za-zÄÖÜäöüß])brut\b/g, '$1 brut')
+    .replace(/([a-zäöüß])([A-ZÄÖÜ])/g, '$1 $2')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([）\)])/, '$1')
+    .replace(/([（\(])\s+/g, '$1')
+    .trim();
+
+  return name;
+}
+
+function mapDocWine(card: WineryCard, wine: DocWine, index: number): WineryWine {
+  const type = docTypeMap[wine.type];
+  const summary = normalizeDocText(wine.summary);
+  const tasting = normalizeDocText(wine.tasting);
+  const analysis = normalizeDocText(wine.analysis);
+  const vinification = normalizeDocText(wine.vinification);
+  const soil = normalizeDocText(wine.soil);
+  const serving = normalizeDocText(wine.serving);
+  const oneLine = summary || tasting || '資料参照';
+  const servingText = serving || '資料参照';
+
+  return {
+    id: `${card.id}-${String(index + 1).padStart(2, '0')}`,
+    name: normalizeWineName(wine.name),
+    type,
+    subline: `${type}`,
+    producer: card.name,
+    region: card.region,
+    volume: '0.75L',
+    image: card.photo,
+    quickSpecs: [type, card.region],
+    oneLine,
+    recommend: servingText,
+    pairing: servingText,
+    tastingNote: tasting || oneLine,
+    analysis: analysis || '資料参照',
+    vinification: vinification || '資料参照',
+    soil: soil || '資料参照',
+    metrics: metricsByType[type],
+  };
+}
+
+type WineryCardTextBlock =
+  | { kind: 'p'; text: string }
+  | { kind: 'ul'; items: string[] }
+  | { kind: 'quote'; lines: string[] };
+
+type WineryCardText = {
+  title: string;
+  blocks: WineryCardTextBlock[];
+  risingLine: string;
+};
+
+const wineryCardTextById: Record<string, WineryCardText> = {
+  horst: {
+    title: 'Weingut Horst Sauer | Franken',
+    blocks: [
+      { kind: 'ul', items: ['・Muschelkalk × Structure & Reflection'] },
+      { kind: 'p', text: 'ムッシュカルク（貝殻石灰質）由来の骨格と反射' },
+    ],
+    risingLine: '立ち上がるもの：毅然とした明快さ',
+  },
+  ludwig: {
+    title: 'Weingut Ludwig | Mosel',
+    blocks: [
+      {
+        kind: 'quote',
+        lines: [
+          '・Soft Devonian Slate × Ethereal Lift',
+          '（柔らかいデボン紀のスレート × “ethereal” 幽玄でハーバルな立ち上がり）',
+          '輪郭は柔らかく、抜けは高く、心がほどける。',
+        ],
+      },
+    ],
+    risingLine: '立ち上がるもの：心がほどける開放感',
+  },
+  stodden: {
+    title: 'Jean Stodden das Rotweingut | Ahr',
+    blocks: [
+      {
+        kind: 'quote',
+        lines: ['・Slate × tension & finesse', '（スレート × 張りのある精妙な繊細さ）'],
+      },
+      { kind: 'p', text: '緊張感と、真っ直ぐに伸びる余韻。' },
+    ],
+    risingLine: '立ち上がるもの：凛線（りんせん）',
+  },
+  dautel: {
+    title: 'Weingut Dautel | Württemberg',
+    blocks: [
+      {
+        kind: 'ul',
+        items: ['• Gipskeuper Keuper × Concentration＆Precision', '• Schilfsandstein × Proportion'],
+      },
+      { kind: 'p', text: 'ギプスコイパー（石膏質）由来の密度や精度' },
+      { kind: 'p', text: 'シルフザントシュタイン 由来のエレガントな均整' },
+    ],
+    risingLine: '立ち上がるもの：大局の構成力（Grand Composition）懐の深いエレガンス',
+  },
+  salwey: {
+    title: 'Weingut Salwey | Baden',
+    blocks: [
+      { kind: 'ul', items: ['・Volcanic × Core', '・Loess × Roundness'] },
+      { kind: 'p', text: '火山が“芯”を作り、 loess（レス）が“丸み”を与える。' },
+    ],
+    risingLine: '立ち上がるもの： “purism”　多面に光を当てる洞察力',
+  },
+  landerer: {
+    title: 'Weingut Landerer | Baden',
+    blocks: [
+      { kind: 'ul', items: ['・Volcanic × Linear Drive'] },
+      { kind: 'p', text: '火山風化土壌の直線的な推進力' },
+      { kind: 'p', text: 'マグネシウムと鉄分（玄武岩）由来の輪郭・ミネラル・スパイス感' },
+    ],
+    risingLine: '立ち上がるもの：端正でスリリング',
+  },
+  buerklinwolf: {
+    title: 'Weingut Dr. Bürklin Wolf | Pfalz',
+    blocks: [
+      {
+        kind: 'ul',
+        items: [
+          '・Cru × Biodynamics × Dry Riesling',
+          '・Wachenheim：sandstone 赤砂岩×ハーバル',
+          '・Deidesheim：Kalkriff （玄武岩＋砂岩）×エレガンス×芯',
+          '・Ruppertsberg：Buntsandstein ×陽だまり×厚み',
+          '・Forst：Volcanic basalt ×玄武岩×推進力',
+        ],
+      },
+      { kind: 'p', text: '（格付けレアものバックヴィンテージ）' },
+    ],
+    risingLine: '立ち上がるもの：容易には全貌を見せない',
+  },
+  bus: {
+    title: 'Weingut Bus | Pfalz',
+    blocks: [
+      { kind: 'ul', items: ['・Sandstone × Clear response'] },
+      { kind: 'p', text: '（赤砂岩の由来の明瞭な反応）' },
+      { kind: 'p', text: '赤砂岩の鉄分などにより果実の輪郭をはっきりと描き出し、瞬時に整う。' },
+    ],
+    risingLine: '立ち上がるもの：的確な即対応',
+  },
+  hamm: {
+    title: 'Weingut Hamm | Rheingau',
+    blocks: [
+      { kind: 'ul', items: ['・Mountain & River'] },
+      {
+        kind: 'ul',
+        items: [
+          '• Dachsberg：red slate × quartzite（透明感・張り・輪郭・スパイス）',
+          '• Jesuitengarten：Rhine alluvium×löss（長い成熟・気品・調和・丸み）',
+          '• Hasensprung：loess loam（推進力・緊張感・構造的）',
+        ],
+      },
+    ],
+    risingLine: '立ち上がるもの：畑ごとの個性が“rassig”活き活きとありのままに',
+  },
+  ress: {
+    title: 'Weingut Balthasar Ress | Rheingau',
+    blocks: [
+      {
+        kind: 'ul',
+        items: [
+          '• West side: Slate × quartzite （ミネラル印象、緊張感）',
+          '• East side: Sandstone × rhyolite （表現力、将来性のある酸）',
+        ],
+      },
+      { kind: 'p', text: '（格付けレアものバックヴィンテージ）' },
+    ],
+    risingLine: '立ち上がるもの：GROSSE LAGE中心・信頼と歴史のラインガウ',
+  },
+};
+
+function renderWineryCardCopy(cardId: string) {
+  const copy = wineryCardTextById[cardId];
+  if (!copy) return null;
+  const risingLabel = '立ち上がるもの：';
+  const hasRisingLabel = copy.risingLine.startsWith(risingLabel);
+  const risingValue = hasRisingLabel ? copy.risingLine.slice(risingLabel.length) : copy.risingLine;
+
+  const paragraphClassName = (text: string) =>
+    text.startsWith('（') || text.startsWith('(')
+      ? 'm-0 text-[12px] leading-[1.85] text-neutral-600'
+      : 'm-0 text-[13px] leading-[1.9] text-neutral-700';
+
+  return (
+    <>
+      <h3 className="text-[15px] font-semibold tracking-[0.02em] text-neutral-900 break-keep hyphens-none [text-wrap:balance] min-w-0">
+        {copy.title.includes(' | ') ? (
+          <>
+            <span>{copy.title.split(' | ')[0]}</span>
+            <wbr />
+            <span className="mx-2 text-neutral-400">|</span>
+            <span>{copy.title.split(' | ')[1]}</span>
+          </>
+        ) : (
+          copy.title
+        )}
+      </h3>
+      <div className="mt-4 min-w-0 text-[13px] leading-[1.9] text-neutral-700 max-w-[36ch] whitespace-normal break-words">
+        <div className="space-y-3">
+          {copy.blocks.map((block, index) => {
+            if (block.kind === 'p') {
+              return (
+                <p key={`${cardId}-p-${index}`} className={paragraphClassName(block.text)}>
+                  {block.text}
+                </p>
+              );
+            }
+
+            if (block.kind === 'quote') {
+              return (
+                <blockquote key={`${cardId}-q-${index}`} className="m-0 space-y-2.5">
+                  {block.lines.map((line, lineIndex) => (
+                    <p key={`${cardId}-q-${index}-${lineIndex}`} className={paragraphClassName(line)}>
+                      {line}
+                    </p>
+                  ))}
+                </blockquote>
+              );
+            }
+
+            return (
+              <ul key={`${cardId}-ul-${index}`} className="m-0 list-none p-0 space-y-1">
+                {block.items.map((item, itemIndex) => (
+                  <li key={`${cardId}-ul-${index}-${itemIndex}`} className="leading-[1.75]">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            );
+          })}
+          <div className="mt-4 pt-3 border-t border-black/5">
+            <p className="m-0 text-[12.5px] leading-[1.8] text-neutral-800">
+              {hasRisingLabel ? (
+                <>
+                  <span className="font-semibold">{risingLabel}</span>
+                  <span className="font-normal">{risingValue}</span>
+                </>
+              ) : (
+                <span className="font-normal">{copy.risingLine}</span>
+              )}
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 const wineries: WineryCard[] = [
   {
     id: 'dautel',
     name: 'Weingut Dautel',
     region: 'Wurttemberg',
     style: 'Lembergerを軸にした、芯のある辛口。',
+    blurb1: '',
+    blurb2:
+      '**Gipskeuper** **Keuper** × Precision / **Schilfsandstein** × Proportion\nギプスコイパー（石膏質）由来の密度や精度、シルフザントシュタイン由来のエレガントな均整。\n立ち上がるもの：揺るがない構築力。',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/dautel-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'dautel',
       producer: 'Weingut Dautel',
@@ -93,10 +425,12 @@ const wineries: WineryCard[] = [
     name: 'Weingut Horst Sauer',
     region: 'Franken',
     style: 'Silvanerを軸にした端正な辛口。',
+    blurb1: '',
+    blurb2: '**Muschelkalk** × Structure & Reflection\nチョークの締まりと塩味の余韻。透明感で終わらない芯。\n立ち上がるもの：毅然とした明快さ（Resolute clarity）。',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/horst-sauer-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'horst',
       producer: 'Weingut Horst Sauer',
@@ -137,10 +471,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Landerer',
     region: 'Baden',
     style: 'Pinot系を軸に、透明感ある辛口。',
+    blurb1: '',
+    blurb2:
+      '**Volcanic** × Linear Drive\n火山風化土壌の直線的な推進力。マグネシウムと鉄分（玄武岩）由来の輪郭・ミネラル・スパイス感。\n立ち上がるもの：未来感。',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/landerer-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'landerer',
       producer: 'Weingut Landerer',
@@ -181,10 +518,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Ludwig',
     region: 'Mosel',
     style: 'Rieslingの緊張感と余韻。',
+    blurb1: '',
+    blurb2:
+      'soft Devonian **Slate** × Ethereal Lift（柔らかいデボン紀のスレート × “ethereal” 霊妙でハーバルな立ち上がり）\n輪郭は柔らかく、抜けは高く、心がほどける。\n立ち上がるもの：心がほどける開放感。',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/ludwig-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'ludwig',
       producer: 'Weingut Ludwig',
@@ -225,10 +565,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Hamm',
     region: 'Rheingau',
     style: 'Rieslingを軸にした、上品な辛口。',
+    blurb1: '',
+    blurb2:
+      'Mountain & River\n• Dachsberg：**red slate** × **quartzite**（張り・輪郭・スパイス）\n• Jesuitengarten：**Rhine alluvium**（温暖・長い成熟・厚み）\n• Hasensprung：**loess loam**（柔らかさと物語の畑）\n赤スレートと石英岩が描く、澄んだ輪郭と流れ。\n立ち上がるもの：循環の物語',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/hamm-new-rev.jpg',
     imageClass: 'object-cover object-[45%_30%]',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'hamm',
       producer: 'Weingut Hamm',
@@ -269,10 +612,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Bus',
     region: 'Pfalz',
     style: '果実とミネラルの均衡が美しい辛口。',
+    blurb1: '',
+    blurb2:
+      '**Sandstone** × Clear response\n赤砂岩由来の明瞭な反応。赤砂岩の鉄分などにより果実の輪郭をはっきりと描き出し、瞬時に整う。\n立ち上がるもの：的確な即対応',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/bus-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'bus',
       producer: 'Weingut Bus',
@@ -313,10 +659,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Ress',
     region: 'Rheingau',
     style: '伸びやかな酸と塩味のある辛口。',
+    blurb1: '',
+    blurb2:
+      '**Loess** & **Quartzite** × Balance\n土壌の水分保持が熟度を支え、石灰岩・マール由来のミネラル要素＋酸が長期熟成性を形作る。\n立ち上がるもの：信頼と展開',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/ress-new-rev.jpg',
     imageClass: 'object-cover',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'ress',
       producer: 'Weingut Ress',
@@ -357,10 +706,13 @@ const wineries: WineryCard[] = [
     name: 'Weingut Salwey',
     region: 'Baden',
     style: 'Pinot系の骨格と静かな奥行き。',
+    blurb1: '',
+    blurb2:
+      '**Volcanic** × Core / **Loess** × Roundness\n火山が“芯”を作り、loess（レス）が“丸み”を与える。\n立ち上がるもの：“purism” 多面に光を当てる洞察力',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/salwey-new-rev.jpg',
     imageClass: 'object-cover object-[50%_38%]',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'salwey',
       producer: 'Weingut Salwey',
@@ -398,17 +750,20 @@ const wineries: WineryCard[] = [
   },
   {
     id: 'buerklinwolf',
-    name: 'Weingut Dr. Bürklin-Wolf',
+    name: 'Weingut Dr. Bürklin Wolf',
     region: 'Pfalz',
     style: 'Biodynamic × Grip & Clarity',
+    blurb1: '',
+    blurb2:
+      'Geology Mosaic × Precision\nForst：**Volcanic basalt** × Grip（solidity）堅さ\nDeidesheim：**Kalkriff** × Depth 深み\nRuppertsberg：**Buntsandstein** × Volume ボリューム\nWachenheim：**sandstone** × Brightness 明るさ + **Riverine strata** × Core 緊張\n玄武岩、赤黄砂岩、石灰リーフ、段丘砂利──4つの村と多層の地質を、バイオダイナミックと大樽発酵で“緊張の輪郭”へ束ねる。【スイス時計の様な精密さ】\n立ち上がるもの：体系化と精密な時間設計',
+    rising: '',
     keywords: 'Village / Riesling / Dry / Grip',
     count: '取扱 2種',
     photo: '/wineries/dr-burkl-wolf-new-rev.jpg',
     imageClass: 'object-cover object-[50%_42%]',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'buerklinwolf',
-      producer: 'Dr. Bürklin-Wolf',
+      producer: 'Weingut Dr. Bürklin Wolf',
       region: 'Pfalz（Deidesheim / Ruppertsberg）',
       image: '/wineries/dr-burkl-wolf-new-rev.jpg',
       first: {
@@ -443,16 +798,18 @@ const wineries: WineryCard[] = [
   },
   {
     id: 'stodden',
-    name: 'Weingut Jean Stodden',
+    name: 'Jean Stodden das Rotweingut',
     region: 'Ahr',
     style: 'Spatburgunderの精緻な表現。',
+    blurb1: '',
+    blurb2: '**slate** × tension & finesse（スレート × 張りのある精妙な繊細さ）\n緊張感と、真っ直ぐに伸びる余韻。\n立ち上がるもの：凛線（りんせん）。',
+    rising: '',
     count: '取扱 2種',
     photo: '/wineries/jean-stodden-new-rev.jpg',
     imageClass: 'object-cover object-[50%_42%]',
-    href: '#contact',
     wines: buildWines({
       wineryId: 'stodden',
-      producer: 'Weingut Jean Stodden',
+      producer: 'Jean Stodden das Rotweingut',
       region: 'Ahr',
       image: '/wineries/jean-stodden-new-rev.jpg',
       first: {
@@ -489,12 +846,20 @@ const wineries: WineryCard[] = [
 
 const wineryEditorialCopy: Record<string, { title: string; caption: [string, string, string] }> = {
   stodden: {
-    title: '① Jean Stodden｜Ahr',
-    caption: ['Ahr｜Slate × Tension', '急斜面スレートが生む、精緻な酸と緊張感ある骨格。', '立ち上がるもの：静かな集中。'],
+    title: '① Jean Stodden das Rotweingut｜Ahr',
+    caption: [
+      'slate × tension & finesse（スレート × 張りのある精妙な繊細さ）',
+      '立ち上がる言葉：凛線（りんせん）。',
+      '緊張感と真っ直ぐに伸びる余韻。',
+    ],
   },
   ludwig: {
     title: '② Weingut Ludwig｜Mosel',
-    caption: ['Mosel｜Slate × Lift', 'スレート由来の軽やかさと透明感。', '立ち上がるもの：対話の流れ。'],
+    caption: [
+      'soft Devonian Slate × Ethereal Lift（柔らかいデボン紀のスレート × “ethereal” 霊妙でハーバルな立ち上がり）',
+      '立ち上がる言葉：心がほどける開放感',
+      '',
+    ],
   },
   hamm: {
     title: '③ Weingut Hamm｜Rheingau',
@@ -505,7 +870,7 @@ const wineryEditorialCopy: Record<string, { title: string; caption: [string, str
     caption: ['Rheingau｜Loess & Quartzite × Balance', '歴史的区画の安定感と、伸びのあるバランス。', '立ち上がるもの：信頼。'],
   },
   buerklinwolf: {
-    title: '⑤ Dr. Bürklin-Wolf｜Pfalz',
+    title: '⑤ Weingut Dr. Bürklin Wolf｜Pfalz',
     caption: ['Pfalz｜Limestone × Depth', '石灰岩の奥行きと、思想のあるクリアな緊張。', '立ち上がるもの：思想。'],
   },
   bus: {
@@ -531,34 +896,68 @@ const wineryEditorialCopy: Record<string, { title: string; caption: [string, str
 };
 
 const wineryDisplayOrder: WineryCard['id'][] = [
+  'dautel',
+  'horst',
+  'salwey',
+  'hamm',
+  'buerklinwolf',
   'stodden',
   'ludwig',
-  'dautel',
-  'salwey',
-  'horst',
-  'landerer',
-  'bus',
-  'hamm',
   'ress',
-  'buerklinwolf',
+  'bus',
+  'landerer',
 ];
 
-const wineryNumberGlyphs = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩'] as const;
+const wineryIdeelogosUrlById: Record<string, string> = {
+  dautel: 'https://ideelogos.com/pages/dautel',
+  horst: 'https://ideelogos.com/pages/horst-sauer',
+  landerer: 'https://ideelogos.com/pages/landerer',
+  ludwig: 'https://ideelogos.com/pages/gebruder-ludwig',
+  hamm: 'https://ideelogos.com/pages/hamm',
+  bus: 'https://ideelogos.com/pages/bus',
+  ress: 'https://ideelogos.com/pages/balthasar-ress',
+  salwey: 'https://ideelogos.com/pages/salwey',
+  buerklinwolf: 'https://ideelogos.com/pages/dr-burklin-wolf',
+  stodden: 'https://ideelogos.com/pages/jean-stodden',
+};
 
 export default function CatalogueSection() {
-  const [activeWinery, setActiveWinery] = useState<WineryCard | null>(null);
+  const wineriesWithDocData: WineryCard[] = wineries.map((card) => {
+    const docs = docWineData[card.id] ?? [];
+    const ideelogosUrl = wineryIdeelogosUrlById[card.id];
+
+    if (!docs.length) {
+      return {
+        ...card,
+        ideelogosUrl,
+      };
+    }
+
+    const mappedWines = docs.map((wine, index) => mapDocWine(card, wine, index));
+    return {
+      ...card,
+      ideelogosUrl,
+      wines: mappedWines,
+      count: `取扱 ${mappedWines.length}種`,
+    };
+  });
+
   const orderedWineries = wineryDisplayOrder
-    .map((id) => wineries.find((winery) => winery.id === id))
+    .map((id) => wineriesWithDocData.find((winery) => winery.id === id))
     .filter((winery): winery is WineryCard => Boolean(winery));
 
   return (
     <section className="wineries-layout">
       <header className="wineries-head">
-        <p className="section-kicker">W I N E R I E S / 取 り 扱 い</p>
-        <h2 className="section-title-mincho wineries-title">
+        <p className="section-kicker">
+          <span className="tracking-[0.35em]">WINERIES</span>
+          <span className="mx-2 tracking-[0.08em]">/</span>
+          <span className="tracking-[0.08em]">取り扱い</span>
+        </p>
+        <h2 className="section-title-mincho wineries-title break-keep hyphens-none [text-wrap:balance]">
           <span className="wineries-title-line">取り扱いワイン</span>
           <br />
-          <span className="wineries-title-line">全11ワイナリー</span>
+          <span className="wineries-title-line">全10ワイナリー</span>
         </h2>
         <div className="wineries-copy">
           <p className="wineries-lead">FINDESTは、ドイツの希少なワインを、市場の都合ではなく、造り手の“線”と品質の再現性で選びます。</p>
@@ -567,20 +966,9 @@ export default function CatalogueSection() {
       </header>
 
       <div className="wineries-grid">
-        {orderedWineries.map((winery, index) => (
-          <article
-            key={winery.id}
-            className="winery-card"
-            role="button"
-            tabIndex={0}
-            onClick={() => setActiveWinery(winery)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                setActiveWinery(winery);
-              }
-            }}
-          >
+        {orderedWineries.map((winery) => {
+          return (
+          <article key={winery.id} className="winery-card min-w-0">
             <div className="winery-card-image">
               <Image
                 src={winery.photo}
@@ -591,47 +979,26 @@ export default function CatalogueSection() {
               />
             </div>
 
-            <div className="winery-card-body">
-              <h3>
-                {`${wineryNumberGlyphs[index] ?? `${index + 1}.`} ${
-                  (wineryEditorialCopy[winery.id]?.title ?? `${winery.name}｜${winery.region}`).replace(/^[①②③④⑤⑥⑦⑧⑨⑩]\s*/, '')
-                }`}
-              </h3>
-              <p className="winery-card-caption">
-                {(wineryEditorialCopy[winery.id]?.caption ?? [winery.style, winery.keywords ?? '', ''])
-                  .filter(Boolean)
-                  .slice(0, 3)
-                  .map((line) => (
-                    <span key={`${winery.id}-${line}`} className="winery-card-caption-line">
-                      {line}
-                    </span>
-                  ))}
-              </p>
+            <div className="winery-card-body winery-card__body min-w-0 rounded-2xl bg-white/18 border border-black/5 p-6">
+              {renderWineryCardCopy(winery.id)}
             </div>
 
-            <div className="winery-card-footer">
-              <p className="winery-card-count">{winery.count}</p>
-              <button
-                type="button"
-                className="winery-more-link"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setActiveWinery(winery);
-                }}
-              >
-                ラインナップを見る →
-              </button>
+            <div className="winery-card-footer winery-card__footer">
+              <span className="winery-card__orderLabel" aria-hidden="true">取引開始順</span>
+              {winery.ideelogosUrl ? (
+                <a href={winery.ideelogosUrl} className="winery-more-link winery-card__detailLink">
+                  ワイナリー詳細
+                </a>
+              ) : (
+                <span className="winery-more-link winery-card__detailLink" aria-disabled="true">
+                  ワイナリー詳細
+                </span>
+              )}
             </div>
           </article>
-        ))}
+        )})}
       </div>
-
-      {activeWinery ? <WineryDrawer key={activeWinery.id} winery={activeWinery} onClose={() => setActiveWinery(null)} /> : null}
     </section>
   );
 }
-
-
-
-
 

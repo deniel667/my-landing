@@ -18,7 +18,7 @@ export default function Hero() {
       <div className="col-span-1 md:col-span-10 md:col-start-2 flex flex-col justify-center h-full">
         <div className="mb-8 fade-in">
           <span className="text-accent text-sm tracking-widest mb-4 block">{hero.eyebrow}</span>
-          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-tight mb-6">
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl leading-tight mb-6 break-keep hyphens-none [text-wrap:balance]">
             {line1}
             <br />
             <span className="italic font-light">Technical</span> {line2?.replace("Technical ", "")}
@@ -27,7 +27,7 @@ export default function Hero() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-8 fade-in delay-100">
           <div>
-            <h2 className="font-serif text-xl leading-relaxed mb-6 text-text">
+            <h2 className="font-serif text-xl leading-relaxed mb-6 text-text break-keep hyphens-none [text-wrap:balance]">
               {hero.lead[0]}
               <br />
               {hero.lead[1]}

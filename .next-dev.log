@@ -1,0 +1,46 @@
+
+> my-landing@0.1.0 dev
+> next dev --port 3000
+
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.2:3000
+
+✓ Starting...
+✓ Ready in 1051ms
+○ Compiling / ...
+ GET / 200 in 3.7s (compile: 3.5s, render: 204ms)
+ GET / 200 in 81ms (compile: 6ms, render: 75ms)
+✓ Compiled in 97ms
+ GET / 200 in 153ms (compile: 46ms, render: 107ms)
+✓ Compiled in 89ms
+✓ Compiled in 75ms
+✓ Compiled in 75ms
+✓ Compiled in 433ms
+✓ Compiled in 324ms
+✓ Compiled in 328ms
+✓ Compiled in 411ms
+ GET / 200 in 183ms (compile: 67ms, render: 116ms)
+✓ Compiled in 322ms
+ GET / 200 in 86ms (compile: 8ms, render: 79ms)
+✓ Compiled in 408ms
+✓ Compiled in 86ms
+✓ Compiled in 108ms
+✓ Compiled in 373ms
+ GET / 200 in 196ms (compile: 67ms, render: 129ms)
+✓ Compiled in 88ms
+✓ Compiled in 86ms
+✓ Compiled in 80ms
+✓ Compiled in 74ms
+✓ Compiled in 365ms
+ GET / 200 in 217ms (compile: 69ms, render: 148ms)
+✓ Compiled in 97ms
+✓ Compiled in 335ms
+✓ Compiled in 334ms
+ GET / 200 in 195ms (compile: 69ms, render: 125ms)
+✓ Compiled in 303ms
+ GET / 200 in 83ms (compile: 7ms, render: 77ms)
+✓ Compiled in 80ms
+✓ Compiled in 347ms
+✓ Compiled in 285ms
+ GET / 200 in 202ms (compile: 72ms, render: 129ms)

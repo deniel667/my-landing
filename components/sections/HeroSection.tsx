@@ -1,9 +1,33 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import type { HeroData } from '@/data/my-landing/site';
 import NorenBlobs from '@/components/NorenBlobs';
 
 type Props = { data: HeroData };
 
 export default function HeroSection({ data }: Props) {
+  const IG_WEB = 'https://www.instagram.com/findest_japan/';
+  const [igHref, setIgHref] = useState(IG_WEB);
+  const leadText = data.lead.filter(Boolean).join(' ');
+  const isInstagramCta = (href: string, label: string) => `${href} ${label}`.toLowerCase().includes('instagram');
+  const cta0IsInstagram = isInstagramCta(data.ctas[0]?.href ?? '', data.ctas[0]?.label ?? '');
+  const cta1IsInstagram = isInstagramCta(data.ctas[1]?.href ?? '', data.ctas[1]?.label ?? '');
+
+  useEffect(() => {
+    const ua = navigator.userAgent ?? '';
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIgHref('instagram://user?username=findest_japan');
+      return;
+    }
+    if (/Android/i.test(ua)) {
+      setIgHref('intent://instagram.com/_u/findest_japan/#Intent;package=com.instagram.android;scheme=https;end');
+      return;
+    }
+    setIgHref(IG_WEB);
+  }, []);
+
   return (
     <header id="hero" className="hero-noren">
       <div className="hero-noren-bg" aria-hidden="true">
@@ -61,26 +85,36 @@ export default function HeroSection({ data }: Props) {
 
       <div className="container hero-grid-wrap">
         <div className="grid12 hero-grid">
-          <div className="hero-content-block">
+          <div className="hero-content-block min-w-0">
             <div className="hero-micro-haze">
               <div className="hero-headline-stack">
                 <p className="hero-kicker-small">Dark Noren / Entrance</p>
                 <p className="hero-kicker">{data.eyebrow}</p>
-                <h1 className="hero-title">
-                  <span className="hero-title-line">{data.lead[0]}</span>
-                  <br />
-                  <span className="hero-title-line">{data.lead[1]}</span>
-                  <br />
-                  <span className="hero-title-line">{data.lead[2]}</span>
-                </h1>
+                <div id="hero-wrap-text-only-29" className="hero-headline-wrap w-full min-w-0">
+                  <h1 className="hero-title inline-block max-w-[34ch] md:max-w-[32ch] lg:max-w-[30ch] xl:max-w-[28ch] [text-wrap:balance] break-keep hyphens-none whitespace-normal [word-break:keep-all] [writing-mode:horizontal-tb]">
+                    {leadText}
+                  </h1>
+                </div>
               </div>
               <div className="hero-lower-content">
                 <p className="hero-subcopy">{data.sub}</p>
                 <div className="hero-actions">
-                  <a href={data.ctas[0].href} className="cta-button cta-button-paper hero-action-button hero-action-primary">
+                  <a
+                    href={cta0IsInstagram ? igHref : data.ctas[0].href}
+                    target={cta0IsInstagram ? '_blank' : undefined}
+                    rel={cta0IsInstagram ? 'noreferrer' : undefined}
+                    aria-label={cta0IsInstagram ? 'Instagram (opens in app if available)' : undefined}
+                    className="cta-button cta-button-paper hero-action-button hero-action-primary"
+                  >
                     {data.ctas[0].label}
                   </a>
-                  <a href={data.ctas[1].href} className="cta-button cta-button-ghost hero-action-button hero-action-secondary">
+                  <a
+                    href={cta1IsInstagram ? igHref : data.ctas[1].href}
+                    target={cta1IsInstagram ? '_blank' : undefined}
+                    rel={cta1IsInstagram ? 'noreferrer' : undefined}
+                    aria-label={cta1IsInstagram ? 'Instagram (opens in app if available)' : undefined}
+                    className="cta-button cta-button-ghost hero-action-button hero-action-secondary"
+                  >
                     {data.ctas[1].label}
                   </a>
                 </div>

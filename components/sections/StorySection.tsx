@@ -29,15 +29,15 @@ export default function StorySection() {
   }, [isVisible]);
 
   return (
-    <section ref={rootRef} className={`story-layout ${isVisible ? 'is-visible' : ''}`}>
+    <section ref={rootRef} className={`story-layout !pt-6 !pb-8 lg:!pt-8 lg:!pb-10 ${isVisible ? 'is-visible' : ''}`}>
       <span className="story-top-rule" aria-hidden="true" />
 
       <header className="story-head">
         <p className="story-eyebrow">S T O R Y / 生 産 者 の 覚 悟</p>
-        <h2 className="story-title">
-          <span className="story-title-line">「売り方」ではなく、</span>
+        <h2 className="story-title break-keep hyphens-none [text-wrap:balance]">
           <span className="story-title-line">人生をかけて</span>
-          <span className="story-title-line">造られた一本を</span>
+          <span className="story-title-line">造られた一本だから、人々に「変容」を</span>
+          <span className="story-title-line">与えてくれる</span>
         </h2>
       </header>
 
@@ -45,8 +45,8 @@ export default function StorySection() {
         <div className="story-main prose story-reveal story-delay-0">
           <p className="story-lead">それぞれのワイナリーには、長い歴史があります。成功だけでなく、失敗や葛藤、自然の厳しさと向き合いながら、命を削るようにして造られてきたワインがあります。</p>
           <p>FINDESTが選ぶ基準は、市場の都合や流行ではありません。造り手が自らの哲学で積み上げてきた品質と、そのワインが宿す背景です。</p>
-          <p>FINDESTは、生産者の背景や想い、秘話を知っているからこそ、<span className="story-ink-underline">その「熱量」ごと、次の表現者へつなぐ</span>役割を担っています。</p>
-          <p className="story-role">役割：生産者の熱量を、現場で伝わる体験へ橋渡しすること。</p>
+          <p>FINDESTは、各生産者との長年の関係性、頻度の高い交流などから、生産者の背景や想い、秘話やエピソードの数々に触れてきたからこそ、<span className="story-ink-underline">「深い解釈を以て」次の表現者へつなぐ</span>役割を担っています。</p>
+          <p className="story-role">役割：生産者の「息吹」を、各パートナーの「現場でエンドユーザーに伝わる体験」へ橋渡しすること。それらは「エンドユーザーが表現できる体験」がイメージされている。---表現者から表現者へ---</p>
         </div>
 
         <aside className="story-side story-reveal story-delay-1">
@@ -89,3 +89,4 @@ export default function StorySection() {
     </section>
   );
 }
+

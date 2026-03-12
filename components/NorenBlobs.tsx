@@ -3,7 +3,7 @@
 import React from 'react';
 
 type Variant = 'heroDark' | 'philosophy' | 'relations' | 'neutral';
-type Layout = 'A' | 'B' | 'C';
+type Layout = 'A' | 'B' | 'C' | 'D';
 
 export default function NorenBlobs({
   variant = 'neutral',

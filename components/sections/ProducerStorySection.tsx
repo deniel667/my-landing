@@ -4,7 +4,7 @@
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
         <div className="fade-in-block">
           <p className="text-[10px] uppercase tracking-[0.3em] text-text-secondary mb-3">Producer Story</p>
-          <h2 className="font-serif text-3xl mb-4">生産者の背景と思想</h2>
+          <h2 className="font-serif text-3xl mb-4 break-keep hyphens-none [text-wrap:balance]">生産者の背景と思想</h2>
           <p className="text-sm text-text-secondary leading-relaxed">
             どの銘柄を売るかではなく、誰がどの思想で造っているかまで遡って選定します。
           </p>

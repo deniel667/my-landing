@@ -17,9 +17,9 @@ export const site: SiteData = {
     eyebrow: '「表現者から表現者へ」',
     title: 'Pure Terroir.\nTechnical Precision.',
     lead: [
-      'ワインで、場の品格を整える',
-      '「どのワインを置くか」ではなく、',
-      '「何を表現するか、どう表現するか」まで。',
+      'ワインで、場の品格を整え、',
+      '場に生命力を吹き込む。',
+      '「どのワインを置くか」だけでなく、\n「何を表現するか」「どう形にするか」を共に考える。',
     ],
     sub: '業務用導入：条件（料理・客層・価格帯・本数）を伺い、最短で提案します。',
     ctas: [
@@ -32,3 +32,4 @@ export const site: SiteData = {
 };
 
 export default site;
+

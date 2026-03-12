@@ -7,16 +7,15 @@
 
 const tiers: Tier[] = [
   {
-    title: '0.2% / 最高評価クラス',
-    bullets: ['ドイツの中でも、約0.2%の最高評価クラス'],
-    note: '※五つ星評価：Eichelmann『Deutschlands Weine』（該当年度版）を参照。',
+    title: '体感を起点に選ぶ',
+    bullets: ['まず大切なのは、場でどう体感されるか。味わい・余韻・料理との響き方を起点に選定します。'],
     tierClass: 'trust-tier-top',
   },
   {
-    title: 'VDP / 厳格な基準',
+    title: '評価は後からついてくる',
     bullets: [
-      '取り扱い生産者の多くは、ドイツ高品質辛口ワイン協会VDP（Verband Deutscher Prädikatsweingüter）に所属。',
-      'VDPは、畑・収穫量・醸造・品質基準において厳格な基準を設ける組織です。',
+      '星付きや外部評価は重要な参考情報ですが、出発点ではありません。',
+      '体感に根ざした選定の結果として、評価が後から伴うと考えています。',
     ],
     tierClass: 'trust-tier-upper',
   },
@@ -57,85 +56,33 @@ export default function TrustSection() {
   return (
     <section className="trust-layout panel-section section-reveal-root">
       <header className="trust-head section-cap section-reveal reveal-delay-0">
-        <p className="section-kicker">T R U S T / 世 界 基 準</p>
-        <h2 className="section-title-mincho">
-          <span className="trust-title-line">世界基準で評価される、</span>
-          <span className="trust-title-line">ドイツ高品質ワイン</span>
+        <p className="section-kicker">
+          <span className="tracking-[0.35em]">TRUST</span>
+          <span className="mx-2 tracking-[0.08em]">/</span>
+          <span className="tracking-[0.08em]">世界基準</span>
+        </p>
+        <h2 className="section-title-mincho break-keep hyphens-none [text-wrap:balance]">
+          <span className="trust-title-line">評価の前に、体感覚がある。</span>
         </h2>
-        <p className="trust-intro">FINDESTが扱うのは、世界的に評価の高いドイツの造り手による高品質ワインです。</p>
+        <p className="trust-intro">はじめに「体感」ありき。星付きや評価は後からついてくる。FINDESTはこの順序を大切にしています。</p>
       </header>
 
-      <div className="grid12 trust-grid">
+      <div className="grid12 trust-grid trust-grid--single">
         <div className="trust-left">
           <div className="trust-pyramid section-reveal reveal-delay-1">
-            {tiers.map((tier, index) => (
-              <TrustTier key={tier.title} {...tier} showProofBadge={index === 0} />
+            {tiers.map((tier) => (
+              <TrustTier key={tier.title} {...tier} />
             ))}
           </div>
 
           <div className="trust-cta-row section-reveal reveal-delay-2">
-            <a href="#contact" className="cta-button cta-button-ink">資料請求（PDF）</a>
-            <a href="#contact" className="cta-button trust-cta-secondary">導入相談</a>
+            <div className="trust-cta-actions">
+              <a href="#contact" className="cta-button cta-button-ink">資料請求（PDF）</a>
+              <a href="#contact" className="cta-button trust-cta-secondary">導入相談</a>
+            </div>
             <p className="trust-helper">※ 原則1営業日以内に返信いたします</p>
           </div>
         </div>
-
-        <aside className="trust-vdp-module trust-vdp-dark-band vdpPanel section-reveal reveal-delay-2">
-          <p className="trust-vdp-kicker title">
-            VDP / 原産地階層
-            <span className="trust-vdp-seal dot" aria-hidden="true" />
-          </p>
-          <p className="trust-vdp-caption sub">上に行くほど区画が厳選されます。</p>
-
-          <div className="trust-vdp-pyramid steps" aria-label="VDP Classification">
-            <span className="trust-vdp-spine" aria-hidden="true" />
-
-            <div className="trust-vdp-row trust-vdp-row-gg">
-              <p className="trust-vdp-spine-no idx idxPill" aria-hidden="true">01</p>
-              <section className="trust-vdp-tier stepCard isTop trust-vdp-tier-gg">
-                <div className="trust-vdp-copy">
-                  <p className="trust-vdp-ja">グローセ・ラーゲ（畑の格付）/ GG（辛口）</p>
-                  <p className="trust-vdp-en">TOP TIER (GRAND CRU SITE / DRY DESIGNATION)</p>
-                  <p className="trust-vdp-desc">最上位の区画。GGはその区画の辛口ワイン。</p>
-                </div>
-              </section>
-            </div>
-
-            <div className="trust-vdp-row trust-vdp-row-1">
-              <p className="trust-vdp-spine-no idx idxPill" aria-hidden="true">02</p>
-              <section className="trust-vdp-tier stepCard trust-vdp-tier-1">
-                <div className="trust-vdp-copy">
-                  <p className="trust-vdp-ja">エアステ・ラーゲ</p>
-                  <p className="trust-vdp-en">PREMIER CRU</p>
-                  <p className="trust-vdp-desc">上位区画。地域の核となる畑。</p>
-                </div>
-              </section>
-            </div>
-
-            <div className="trust-vdp-row trust-vdp-row-2">
-              <p className="trust-vdp-spine-no idx idxPill" aria-hidden="true">03</p>
-              <section className="trust-vdp-tier stepCard trust-vdp-tier-2">
-                <div className="trust-vdp-copy">
-                  <p className="trust-vdp-ja">オルツヴァイン</p>
-                  <p className="trust-vdp-en">VILLAGE</p>
-                  <p className="trust-vdp-desc">村名の個性が出るワイン。</p>
-                </div>
-              </section>
-            </div>
-
-            <div className="trust-vdp-row trust-vdp-row-3">
-              <p className="trust-vdp-spine-no idx idxPill" aria-hidden="true">04</p>
-              <section className="trust-vdp-tier stepCard trust-vdp-tier-3">
-                <div className="trust-vdp-copy">
-                  <p className="trust-vdp-ja">グーツヴァイン</p>
-                  <p className="trust-vdp-en">ESTATE</p>
-                  <p className="trust-vdp-desc">生産者の基本となるスタイル。</p>
-                </div>
-              </section>
-            </div>
-          </div>
-          <p className="trust-vdp-note caption">Grosse Lage = 畑の格付 / GG = その畑の辛口（dry）</p>
-        </aside>
       </div>
     </section>
   );

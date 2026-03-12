@@ -64,6 +64,16 @@ function Metric({ label, value }: { label: string; value: number }) {
   );
 }
 
+function getThirdMetric(wine: WineryWine): { label: string; value: number } {
+  if (wine.type === '泡') {
+    return { label: '泡のきめ', value: wine.metrics.bubbles };
+  }
+  if (wine.type === '赤') {
+    return { label: 'ボディ', value: wine.metrics.bubbles };
+  }
+  return { label: 'ミネラル感', value: wine.metrics.bubbles };
+}
+
 function KV({ k, v }: { k: string; v: string }) {
   return (
     <div className="winery-kv">
@@ -129,6 +139,7 @@ export default function WineryDrawer({ winery, onClose }: Props) {
   }, [filteredWines]);
 
   const activeWine = filteredWines.find((wine) => wine.id === activeWineId) ?? filteredWines[0] ?? winery.wines[0];
+  const thirdMetric = activeWine ? getThirdMetric(activeWine) : null;
 
   const onTypeChipKeyDown = (event: ReactKeyboardEvent<HTMLSpanElement>, type: WineType) => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
@@ -278,7 +289,7 @@ export default function WineryDrawer({ winery, onClose }: Props) {
                     <div className="winery-metrics">
                       <Metric label="辛口度" value={activeWine.metrics.dryness} />
                       <Metric label="酸（キレ）" value={activeWine.metrics.acid} />
-                      <Metric label="泡のきめ" value={activeWine.metrics.bubbles} />
+                      <Metric label={thirdMetric?.label ?? '泡のきめ'} value={thirdMetric?.value ?? activeWine.metrics.bubbles} />
                     </div>
 
                     <p className="winery-kicker winery-metric-note">※当社基準（同カテゴリ内の目安）</p>
