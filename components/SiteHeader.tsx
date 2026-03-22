@@ -12,21 +12,20 @@ const allNavItems = [
   { id: 'story', label: 'STORY', sectionId: 'story', href: '/#story' },
   { id: 'service', label: 'SERVICE', sectionId: 'service', href: '/#service' },
   { id: 'wineries', label: 'WINERIES', sectionId: 'catalogue', href: '/#catalogue' },
+  { id: 'wines', label: 'WINES', sectionId: null, href: '/wines' },
   { id: 'contact', label: 'CONTACT', sectionId: 'contact', href: '/#contact' },
 ] as const;
 
 const navItems = SHOW_TRUST ? allNavItems : allNavItems.filter((item) => item.id !== 'trust');
 
 export default function SiteHeader() {
-  const DEFAULT_URL = 'https://wine.findest-japan.com/';
+  const CANON_ORIGIN = 'https://wine.findest-japan.com';
+  const TOP_ANCHOR = '/#hero';
   const INSTAGRAM_WEB = 'https://www.instagram.com/findest_japan/';
   const pathname = usePathname();
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [currentHash, setCurrentHash] = useState('');
-  const [pageUrl, setPageUrl] = useState(DEFAULT_URL);
-
-  const localizedHome = '/';
 
   const navLinks = useMemo(
     () => navItems.map(({ id, label, href, sectionId }) => ({ id, label, href, sectionId })),
@@ -75,19 +74,75 @@ export default function SiteHeader() {
     }, 60);
     return () => window.clearTimeout(timer);
   }, [pathname]);
+  const fallbackCanonicalUrl = `${CANON_ORIGIN}/`;
+  const fallbackToEN = `https://translate.google.com/translate?sl=ja&tl=en&u=${encodeURIComponent(fallbackCanonicalUrl)}`;
+  const fallbackToDE = `https://translate.google.com/translate?sl=ja&tl=de&u=${encodeURIComponent(fallbackCanonicalUrl)}`;
+  const fallbackTopUrl = `${CANON_ORIGIN}${TOP_ANCHOR}`;
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPageUrl(window.location.href);
-  }, []);
+  const stripTranslateParams = (urlStr: string) => {
+    try {
+      const parsed = new URL(urlStr);
+      const keysToDelete: string[] = [];
+      parsed.searchParams.forEach((_, key) => {
+        if (key.startsWith('_x_tr_')) keysToDelete.push(key);
+      });
+      keysToDelete.forEach((key) => parsed.searchParams.delete(key));
+      return parsed.toString();
+    } catch {
+      return urlStr;
+    }
+  };
 
-  const enTranslateHref = `https://translate.google.com/translate?sl=ja&tl=en&u=${encodeURIComponent(pageUrl)}`;
-  const deTranslateHref = `https://translate.google.com/translate?sl=ja&tl=de&u=${encodeURIComponent(pageUrl)}`;
+  const getCanonicalUrlFromWindow = () => {
+    if (typeof window === 'undefined') return fallbackCanonicalUrl;
+    const loc = window.location;
+    const host = loc.hostname;
+
+    if (host.includes('translate.google.')) {
+      const params = new URLSearchParams(loc.search);
+      const sourceUrl = params.get('u');
+      return sourceUrl ? stripTranslateParams(sourceUrl) : fallbackCanonicalUrl;
+    }
+
+    if (host.endsWith('translate.goog')) {
+      const params = new URLSearchParams(loc.search);
+      const keysToDelete: string[] = [];
+      params.forEach((_, key) => {
+        if (key.startsWith('_x_tr_')) keysToDelete.push(key);
+      });
+      keysToDelete.forEach((key) => params.delete(key));
+      const query = params.toString();
+      const search = query ? `?${query}` : '';
+      return `${CANON_ORIGIN}${loc.pathname || '/'}${search}${loc.hash || ''}`;
+    }
+
+    return `${CANON_ORIGIN}${loc.pathname || '/'}${loc.search || ''}${loc.hash || ''}`;
+  };
+
+  const goToLang = (lang: 'jp' | 'en' | 'de') => {
+    const canonical = getCanonicalUrlFromWindow();
+    if (lang === 'jp') {
+      window.location.assign(canonical);
+      return;
+    }
+    const tl = lang === 'en' ? 'en' : 'de';
+    const url = `https://translate.google.com/translate?sl=ja&tl=${tl}&u=${encodeURIComponent(canonical)}`;
+    window.location.assign(url);
+  };
 
   return (
     <nav className="site-nav" aria-label="Primary">
       <div className="shell nav-inner flex items-center justify-between">
-        <a href={localizedHome} className="brand-mark flex flex-col leading-none" aria-label="FINDEST top">
+        <a
+          href={fallbackTopUrl}
+          className="brand-mark flex flex-col leading-none"
+          aria-label="FINDEST top"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.assign(fallbackTopUrl);
+          }}
+        >
           <span className="brand-main uppercase tracking-[0.12em]">FINDEST</span>
           <span className="brand-sub mt-1 text-[10px] uppercase tracking-[0.22em] whitespace-nowrap opacity-80">German Wine Curation</span>
         </a>
@@ -95,9 +150,15 @@ export default function SiteHeader() {
         <div className="nav-right flex items-center gap-6">
           <div className="nav-links flex items-center gap-6">
             {navLinks.map(({ id, href, label, sectionId }) => {
-              const isActive = pathname === '/' && currentHash === sectionId;
+              const isSectionLink = Boolean(sectionId);
+              const isActive = isSectionLink ? pathname === '/' && currentHash === sectionId : pathname === href;
               return (
-                <a key={href} href={href} className={`nav-link${isActive ? ' nav-link-active' : ''}`} onClick={(event) => handleSectionNav(event, sectionId)}>
+                <a
+                  key={href}
+                  href={href}
+                  className={`nav-link${isActive ? ' nav-link-active' : ''}`}
+                  onClick={isSectionLink ? (event) => handleSectionNav(event, sectionId) : undefined}
+                >
                   {label}
                 </a>
               );
@@ -108,13 +169,37 @@ export default function SiteHeader() {
           </div>
 
           <div className="inline-flex items-center rounded-full border border-white/20 bg-transparent text-[11px] uppercase tracking-[0.18em]">
-            <a href={pageUrl} target="_blank" rel="noreferrer" className="px-2 py-1 text-white/80 transition-colors hover:text-white">
+            <a
+              href={fallbackCanonicalUrl}
+              className="px-2 py-1 text-white/80 transition-colors hover:text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToLang('jp');
+              }}
+            >
               JP
             </a>
-            <a href={enTranslateHref} target="_blank" rel="noreferrer" className="border-l border-white/15 px-2 py-1 text-white/80 transition-colors hover:text-white">
+            <a
+              href={fallbackToEN}
+              className="border-l border-white/15 px-2 py-1 text-white/80 transition-colors hover:text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToLang('en');
+              }}
+            >
               EN
             </a>
-            <a href={deTranslateHref} target="_blank" rel="noreferrer" className="border-l border-white/15 px-2 py-1 text-white/80 transition-colors hover:text-white">
+            <a
+              href={fallbackToDE}
+              className="border-l border-white/15 px-2 py-1 text-white/80 transition-colors hover:text-white"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goToLang('de');
+              }}
+            >
               DE
             </a>
           </div>
@@ -147,7 +232,8 @@ export default function SiteHeader() {
         <div className="site-mobile-panel">
           <div className="site-mobile-links">
             {navLinks.map(({ id, href, label, sectionId }) => {
-              const isActive = pathname === '/' && currentHash === sectionId;
+              const isSectionLink = Boolean(sectionId);
+              const isActive = isSectionLink ? pathname === '/' && currentHash === sectionId : pathname === href;
               return (
                 <a
                   key={`mobile-${href}`}
@@ -155,7 +241,9 @@ export default function SiteHeader() {
                   className={`site-mobile-link${isActive ? ' is-active' : ''}`}
                   onClick={(event) => {
                     setIsDrawerOpen(false);
-                    handleSectionNav(event, sectionId);
+                    if (isSectionLink) {
+                      handleSectionNav(event, sectionId);
+                    }
                   }}
                 >
                   {label}

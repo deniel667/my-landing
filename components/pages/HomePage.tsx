@@ -12,6 +12,7 @@ import FoundationSection from '@/components/sections/FoundationSection';
 import ServiceSection from '@/components/sections/ServiceSection';
 import StorySection from '@/components/sections/StorySection';
 import CatalogueSection from '@/components/sections/CatalogueSection';
+import WinePreviewSection from '@/components/sections/WinePreviewSection';
 import VoiceSection from '@/components/sections/VoiceSection';
 import NextStepSection from '@/components/sections/NextStepSection';
 import ContactSection from '@/components/sections/ContactSection';
@@ -163,6 +164,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <WinePreviewSection />
       <Section id="catalogue" variant="full">
         <CatalogueSection />
       </Section>

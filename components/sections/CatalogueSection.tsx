@@ -962,6 +962,15 @@ export default function CatalogueSection() {
         <div className="wineries-copy">
           <p className="wineries-lead">FINDESTは、ドイツの希少なワインを、市場の都合ではなく、造り手の“線”と品質の再現性で選びます。</p>
           <p className="wineries-lead">ただ銘柄を並べるのではなく、店の“場”で成立する体験として設計できるものだけ。食・客層・温度・言葉まで含めて、現場で伝わる形に落とし込みます。</p>
+          <div className="mt-5">
+            <a
+              href="/wines"
+              className="inline-flex items-center gap-2 rounded-full border border-[rgba(31,27,22,0.14)] bg-[rgba(255,255,255,0.42)] px-4 py-2 text-[12px] tracking-[0.08em] text-[rgba(31,27,22,0.84)] transition-colors hover:bg-[rgba(255,255,255,0.68)]"
+            >
+              <span>取扱ワインを見る</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </div>
         </div>
       </header>
 

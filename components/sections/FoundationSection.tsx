@@ -29,21 +29,21 @@ export default function FoundationSection() {
                   <div className="foundation-proof-row">
                     <p className="foundation-proof-label">現場</p>
                     <p className="foundation-proof-body">
-                      代表は、飲食店を数十店舗運営し、人材育成と現場運営に長年携わってきました。忙しい現場の中で、「どうすれば無理なく、伝わるのか」を研究し続けてきたのです。
+                      MIKIKO代表は、かつて都内飲食店を十数店舗運営し、人材育成と現場運営に長年携わってきました。忙しい現場の中で、「どうすれば無理なく、伝わるのか」を研究し続けてきたのです。
                     </p>
                   </div>
 
                   <div className="foundation-proof-row">
                     <p className="foundation-proof-label">表現</p>
                     <p className="foundation-proof-body">
-                      また学生時代には、芸術大学で音楽を専攻し、構造としての「時間・緊張・余白」を学びました。さらに心理領域でも、人の感性や内面に向き合う活動を続けています。
+                      また学生時代には、芸術大学で音楽を専攻し、構造としての「時間・緊張・余白」を学びました。さらに心理やヒューマン ケア/ガイド領域でも、人の内面に向き合い変容につなげる探求と活動を、科学的視点と体感覚トレーニング視点の両輪で貢献しています。
                     </p>
                   </div>
 
                   <div className="foundation-proof-row">
                     <p className="foundation-proof-label">信頼</p>
                     <p className="foundation-proof-body">
-                      生産者とは初期から直接対話を重ね、今も年に数回、密なコミュニケーションを取り続けています。現場・芸術・心理・生産者との信頼そのすべてが重なり、FINDESTのスタイルが生まれました。
+                      生産者とは初期から直接対話を重ね、今も年に数回、密なコミュニケーションを取り続けています。現場・芸術・ヒューマン ケア/ガイド・生産者との信頼そのすべてが重なり、FINDESTのスタイルが生まれました。
                     </p>
                   </div>
                 </div>
