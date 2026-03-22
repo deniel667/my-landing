@@ -157,7 +157,7 @@ export default function SiteHeader() {
                   key={href}
                   href={href}
                   className={`nav-link${isActive ? ' nav-link-active' : ''}`}
-                  onClick={isSectionLink ? (event) => handleSectionNav(event, sectionId) : undefined}
+                  onClick={isSectionLink && sectionId ? (event) => handleSectionNav(event, sectionId) : undefined}
                 >
                   {label}
                 </a>
@@ -241,7 +241,7 @@ export default function SiteHeader() {
                   className={`site-mobile-link${isActive ? ' is-active' : ''}`}
                   onClick={(event) => {
                     setIsDrawerOpen(false);
-                    if (isSectionLink) {
+                    if (isSectionLink && sectionId) {
                       handleSectionNav(event, sectionId);
                     }
                   }}
