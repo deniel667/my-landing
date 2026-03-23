@@ -29,7 +29,7 @@ registerBottleImage('dautel', '2022 Lemberger VDP.Gutswein', '/story/dau-lemberg
 registerBottleImage('dautel', '2023 Spätburgundertrocken', '/story/dau-spat-23.png');
 registerBottleImage('dautel', '2024 Jakob D.', '/story/dau-jak.png');
 registerBottleImage('horst', '2024 EscherndorfSilvanertrocken', '/story/Hor-Esch-Silv-24.png');
-registerBottleImage('horst', '2023 Escherndorf Riesling trocken', '/story/Hor-Esch-Riesl-23.png');
+registerBottleImage('horst', '2023 Escherndorf Riesling trocken', '/story/Hor-Esch-Riesl-23-20260323.png');
 registerBottleImage('horst', '2023 SilvanerbrutSektb.A.', '/story/Hor-silv-sektbrut-2023.png');
 registerBottleImage('ludwig', 'NV RieslingSektBrut', '/story/lud-riesl-sekt.png');
 registerBottleImage('ludwig', '2024 Thörnicher Riesling trocken', '/story/lud-thorn-riesl-24.png');

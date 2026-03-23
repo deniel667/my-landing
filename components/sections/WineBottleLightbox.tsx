@@ -117,9 +117,19 @@ export default function WineBottleLightbox({
                     className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(31,27,22,0.1)] bg-[rgba(255,255,255,0.88)] text-[rgba(31,27,22,0.82)] transition-colors duration-200 hover:bg-[rgba(248,242,234,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.28)]"
                     aria-label="Close image"
                   >
-                    <span aria-hidden="true" className="text-[20px] leading-none">
-                      &times;
-                    </span>
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 16 16"
+                      className="h-[14px] w-[14px] shrink-0"
+                      fill="none"
+                    >
+                      <path
+                        d="M4 4l8 8M12 4 4 12"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </button>
 
                   <div className="rounded-[22px] border border-[rgba(105,84,58,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(250,245,238,0.98)_100%)] px-4 py-4 sm:px-6 sm:py-6">
