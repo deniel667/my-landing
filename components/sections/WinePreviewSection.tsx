@@ -1,6 +1,13 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import NorenBlobs from '@/components/NorenBlobs';
+import WineBottleLightbox from '@/components/sections/WineBottleLightbox';
+import {
+  compactPreviewCopy,
+  compactSentence,
+  formatDisplayTitle,
+  getWineCardCopy,
+  getWineSoilCopy,
+} from '@/data/my-landing/wineCopyResolver';
 import { getExactBottleImageSrc, normalizeWineNameForMatch } from '@/data/my-landing/wineBottleImages';
 import { wineList } from '@/data/my-landing/wineList';
 
@@ -27,130 +34,19 @@ const typeMeta = {
   white: {
     label: 'White',
     badgeClassName:
-      'border-[rgba(198,188,166,0.48)] bg-[linear-gradient(180deg,rgba(255,255,252,0.96)_0%,rgba(247,243,236,0.94)_100%)] text-[rgba(78,68,48,0.94)]',
+      'border-[rgba(198,188,166,0.52)] bg-[linear-gradient(180deg,rgba(255,255,252,0.98)_0%,rgba(247,243,236,0.96)_100%)] text-[rgba(78,68,48,0.96)]',
   },
   red: {
     label: 'Red',
     badgeClassName:
-      'border-[rgba(122,72,78,0.34)] bg-[linear-gradient(180deg,rgba(236,220,223,0.92)_0%,rgba(223,201,205,0.9)_100%)] text-[rgba(90,36,45,0.96)]',
+      'border-[rgba(122,72,78,0.38)] bg-[linear-gradient(180deg,rgba(236,220,223,0.94)_0%,rgba(223,201,205,0.92)_100%)] text-[rgba(90,36,45,0.98)]',
   },
   sparkling: {
     label: 'Sparkling',
     badgeClassName:
-      'border-[rgba(181,154,102,0.42)] bg-[linear-gradient(180deg,rgba(250,244,224,0.96)_0%,rgba(238,228,190,0.93)_100%)] text-[rgba(104,81,28,0.96)]',
+      'border-[rgba(181,154,102,0.48)] bg-[linear-gradient(180deg,rgba(250,244,224,0.98)_0%,rgba(238,228,190,0.95)_100%)] text-[rgba(104,81,28,0.98)]',
   },
 } as const;
-
-function formatPreviewCopy(text: string) {
-  const normalized = text.replace(/\s+/g, ' ').trim();
-  if (!normalized) return '';
-
-  const firstSentence = normalized.match(/^.+?[。！？.!?](?=\s|$|[「『（(])/u)?.[0]?.trim();
-  if (firstSentence) return firstSentence;
-
-  const clause = normalized
-    .split(/[、,，；;:]/u)
-    .map((part) => part.trim())
-    .find(Boolean);
-
-  if (!clause) return normalized;
-
-  const softened = clause
-    .replace(/[でにをがとはもや、と]\s*$/u, '')
-    .replace(/\s+$/u, '');
-
-  return `${softened}。`;
-}
-
-function formatDisplayTitle(value: string) {
-  const replacements: Array<[RegExp, string]> = [
-    [/CabernetSauvignon/g, 'Cabernet Sauvignon'],
-    [/BlancdeNoir/g, 'Blanc de Noir'],
-    [/SauvignonBlanc/g, 'Sauvignon Blanc'],
-    [/Sauvignonblanc/g, 'Sauvignon Blanc'],
-    [/Spätburgundertrocken/g, 'Spätburgunder trocken'],
-    [/Spatburgundertrocken/g, 'Spätburgunder trocken'],
-    [/KaiserstuhlSpätburgundertrocken/g, 'Kaiserstuhl Spätburgunder trocken'],
-    [/KaiserstuhlSpatburgundertrocken/g, 'Kaiserstuhl Spätburgunder trocken'],
-    [/KaiserstuhlSpätburgunder/g, 'Kaiserstuhl Spätburgunder'],
-    [/KaiserstuhlSpatburgunder/g, 'Kaiserstuhl Spätburgunder'],
-    [/GrauburgunderGutsweintrocken/g, 'Grauburgunder Gutswein trocken'],
-    [/WeissburgunderGutsweintrocken/g, 'Weissburgunder Gutswein trocken'],
-    [/Silvanertrocken/g, 'Silvaner trocken'],
-    [/SilvanerbrutSektb\.A\./g, 'Silvaner brut Sekt b.A.'],
-    [/RieslingSektBrut/g, 'Riesling Sekt Brut'],
-    [/Rieslingtrocken/g, 'Riesling trocken'],
-    [/Rieslingdry/g, 'Riesling dry'],
-    [/ThörnicherRiesling/g, 'Thörnicher Riesling'],
-    [/ThornicherRiesling/g, 'Thörnicher Riesling'],
-    [/ThörnicherRitschRiesling/g, 'Thörnicher Ritsch Riesling'],
-    [/RuppertsbergerRiesling/g, 'Ruppertsberger Riesling'],
-    [/DeidesheimerRiesling/g, 'Deidesheimer Riesling'],
-    [/DeidesheimRiesling/g, 'Deidesheim Riesling'],
-    [/WachenheimerRiesling/g, 'Wachenheimer Riesling'],
-    [/RecherHerrenbergSpätburgunder/g, 'Recher Herrenberg Spätburgunder'],
-    [/RecherHerrenbergSpatburgunder/g, 'Recher Herrenberg Spätburgunder'],
-    [/Leiselheim Chardonnay trocken -SchwarzeErde-/g, 'Leiselheim Chardonnay trocken - Schwarze Erde -'],
-    [/EscherndorferAmLumpen/g, 'Escherndorfer Am Lumpen'],
-    [/EscherndorfSilvaner/g, 'Escherndorf Silvaner'],
-  ];
-
-  let next = value.normalize('NFC');
-  replacements.forEach(([pattern, replacement]) => {
-    next = next.replace(pattern, replacement);
-  });
-
-  return next
-    .replace(/([a-zäöüß])([A-ZÄÖÜ])/g, '$1 $2')
-    .replace(/([A-Za-zÄÖÜäöüß])trocken\b/g, '$1 trocken')
-    .replace(/([A-Za-zÄÖÜäöüß])brut\b/g, '$1 brut')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s+([）\)])/g, '$1')
-    .replace(/([（\(])\s+/g, '$1')
-    .trim();
-}
-
-function BottlePreview({ imageSrc, alt }: { imageSrc: string | null; alt: string }) {
-  if (imageSrc) {
-    return (
-      <div className="relative overflow-hidden rounded-[14px] border border-[rgba(31,27,22,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(246,240,231,0.88)_100%)] px-4 py-3">
-        <div className="relative min-h-[118px]">
-          <Image
-            src={imageSrc}
-            alt={alt}
-            fill
-            className="object-contain object-center"
-            sizes="(min-width: 1280px) 16vw, (min-width: 768px) 22vw, 42vw"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative overflow-hidden rounded-[14px] border border-[rgba(31,27,22,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(246,240,231,0.88)_100%)] px-4 py-3">
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_50%_18%,rgba(196,170,120,0.14),rgba(255,255,255,0)_58%)]"
-      />
-      <div className="relative flex min-h-[118px] items-end justify-center">
-        <svg viewBox="0 0 72 160" aria-hidden="true" className="h-[94px] w-[44px] text-[rgba(88,74,56,0.4)]">
-          <path
-            d="M29 7h14v20l7 11v98c0 10-6 17-14 17s-14-7-14-17V38l7-11V7Z"
-            fill="rgba(255,255,255,0.56)"
-            stroke="currentColor"
-            strokeWidth="1.4"
-          />
-          <path
-            d="M31 45h10c4 0 7 3 7 7v70c0 9-5 15-12 15s-12-6-12-15V52c0-4 3-7 7-7Z"
-            fill="rgba(123,93,74,0.12)"
-          />
-          <path d="M29 18h14" stroke="currentColor" strokeWidth="1.15" />
-        </svg>
-      </div>
-    </div>
-  );
-}
 
 export default function WinePreviewSection() {
   return (
@@ -197,32 +93,51 @@ export default function WinePreviewSection() {
               const meta = typeMeta[wine.type];
               const displayTitle = formatDisplayTitle(wine.name);
               const imageSrc = getExactBottleImageSrc(wine.wineryId, wine.name);
+              const cardCopy = getWineCardCopy(wine.wineryId, displayTitle, wine.summary, wine.soil);
+              const soilCopy = getWineSoilCopy(
+                wine.wineryId,
+                displayTitle,
+                cardCopy.soilDescription
+              );
+              const wineDescription = compactPreviewCopy(cardCopy.wineDescription, 78);
+              const soilDescription = compactSentence(soilCopy, 70);
 
               return (
                 <article
                   key={wine.id}
-                  className="rounded-[18px] border border-[rgba(31,27,22,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(250,246,240,0.88)_100%)] px-4 py-3 shadow-[0_3px_10px_rgba(18,16,14,0.02)]"
+                  className="group flex h-full flex-col rounded-[20px] border border-[rgba(31,27,22,0.13)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(250,246,240,0.84)_100%)] p-4 shadow-[0_10px_22px_rgba(18,16,14,0.04)]"
                 >
-                  <BottlePreview imageSrc={imageSrc} alt={displayTitle} />
+                  <WineBottleLightbox imageSrc={imageSrc} alt={displayTitle} />
 
-                  <div className="mt-3 flex items-start justify-between gap-3">
-                    <p className="m-0 pr-2 text-[10px] uppercase tracking-[0.18em] text-[rgba(31,27,22,0.5)]">
-                      {wine.wineryName}
-                    </p>
-                    <span
-                      className={`inline-flex shrink-0 rounded-full border px-3 py-1 text-[9.5px] font-semibold uppercase tracking-[0.16em] ${meta.badgeClassName}`}
-                    >
-                      {meta.label}
-                    </span>
+                  <div className="mt-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="m-0 pr-2 text-[9.5px] uppercase tracking-[0.2em] text-[rgba(31,27,22,0.52)]">
+                        {wine.wineryName}
+                      </p>
+                      <span
+                        className={`inline-flex shrink-0 rounded-full border px-3 py-1 text-[9.5px] font-semibold uppercase tracking-[0.16em] shadow-[0_1px_0_rgba(255,255,255,0.35)_inset] ${meta.badgeClassName}`}
+                      >
+                        {meta.label}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-2.5 font-[var(--font-noto-serif-jp)] text-[17px] leading-[1.34] text-[rgba(14,13,11,0.99)] [text-wrap:balance]">
+                      {displayTitle}
+                    </h3>
                   </div>
 
-                  <h3 className="mt-2.5 font-[var(--font-noto-serif-jp)] text-[15.5px] leading-[1.28] text-[rgba(18,16,14,0.98)] [text-wrap:balance]">
-                    {displayTitle}
-                  </h3>
+                  <div className="mt-3 flex-1 space-y-2.5">
+                    <p className="m-0 min-h-[4.9em] text-[11.5px] leading-[1.66] text-[rgba(31,27,22,0.82)]">
+                      {wineDescription}
+                    </p>
 
-                  <p className="mt-1.5 text-[10.5px] leading-[1.52] text-[rgba(31,27,22,0.74)]">
-                    {formatPreviewCopy(wine.summary)}
-                  </p>
+                    <div className="rounded-[14px] border border-[rgba(31,27,22,0.07)] bg-[rgba(255,255,255,0.54)] px-3 py-2.5">
+                      <p className="m-0 text-[9px] uppercase tracking-[0.18em] text-[rgba(31,27,22,0.5)]">Soil</p>
+                      <p className="mt-1 m-0 text-[10.5px] leading-[1.58] text-[rgba(31,27,22,0.72)]">
+                        {soilDescription}
+                      </p>
+                    </div>
+                  </div>
                 </article>
               );
             })}

@@ -56,6 +56,27 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
+    const currentHash = window.location.hash.replace('#', '');
+    if (currentHash !== 'contact-final' && currentHash !== 'contact') return;
+
+    const scrollToContactForm = () => {
+      const target = document.getElementById('contact-final') ?? document.getElementById('contact');
+      if (!target) return;
+
+      const nav = document.querySelector<HTMLElement>('.site-nav');
+      const navOffset = (nav?.getBoundingClientRect().height ?? 72) + 24;
+      const targetTop = target.getBoundingClientRect().top + window.scrollY - navOffset;
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    };
+
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(scrollToContactForm);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
     const scrollToContactForm = () => {
       const target = document.getElementById('contact-final') ?? document.getElementById('contact');
       if (!target) return false;

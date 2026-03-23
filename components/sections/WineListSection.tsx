@@ -1,8 +1,13 @@
+import Link from 'next/link';
 import NorenBlobs from '@/components/NorenBlobs';
 import WineBottleLightbox from '@/components/sections/WineBottleLightbox';
+import {
+  compactSentence,
+  formatDisplayTitle,
+  getWineCardCopy,
+  getWineSoilCopy,
+} from '@/data/my-landing/wineCopyResolver';
 import { getExactBottleImageSrc } from '@/data/my-landing/wineBottleImages';
-import { wineCardCopy } from '@/data/my-landing/wineCardCopy';
-import { wineSoilCopy } from '@/data/my-landing/wineSoilCopy';
 import { wineList } from '@/data/my-landing/wineList';
 
 const typeMeta = {
@@ -23,183 +28,12 @@ const typeMeta = {
   },
 } as const;
 
-function normalizeCopy(value: string) {
-  return value.replace(/\s+/g, ' ').trim();
-}
-
-function compactSentence(value: string, maxLength: number) {
-  const normalized = normalizeCopy(value);
-  if (!normalized) return '';
-  if (normalized.length <= maxLength) return normalized;
-
-  const sentences = normalized
-    .split(/(?<=[。.!?！？])/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (sentences.length > 0) {
-    const firstSentence = sentences[0];
-    if (firstSentence.length <= maxLength + 12) {
-      return firstSentence;
-    }
-  }
-
-  return normalized.slice(0, maxLength).trimEnd();
-}
-
 function formatWineDescription(summary: string) {
   return compactSentence(summary, Number.MAX_SAFE_INTEGER);
 }
 
 function formatSoilNote(soil: string) {
   return compactSentence(soil, Number.MAX_SAFE_INTEGER);
-}
-
-function formatDisplayTitle(value: string) {
-  const replacements: Array<[RegExp, string]> = [
-    [/CabernetSauvignon/g, 'Cabernet Sauvignon'],
-    [/BlancdeNoir/g, 'Blanc de Noir'],
-    [/SauvignonBlanc/g, 'Sauvignon Blanc'],
-    [/Sauvignonblanc/g, 'Sauvignon Blanc'],
-    [/Spätburgundertrocken/g, 'Spätburgunder trocken'],
-    [/Spatburgundertrocken/g, 'Spätburgunder trocken'],
-    [/KaiserstuhlSpätburgundertrocken/g, 'Kaiserstuhl Spätburgunder trocken'],
-    [/KaiserstuhlSpatburgundertrocken/g, 'Kaiserstuhl Spätburgunder trocken'],
-    [/KaiserstuhlSpätburgunder/g, 'Kaiserstuhl Spätburgunder'],
-    [/KaiserstuhlSpatburgunder/g, 'Kaiserstuhl Spätburgunder'],
-    [/GrauburgunderGutsweintrocken/g, 'Grauburgunder Gutswein trocken'],
-    [/WeissburgunderGutsweintrocken/g, 'Weissburgunder Gutswein trocken'],
-    [/Silvanertrocken/g, 'Silvaner trocken'],
-    [/SilvanerbrutSektb\.A\./g, 'Silvaner brut Sekt b.A.'],
-    [/RieslingSektBrut/g, 'Riesling Sekt Brut'],
-    [/Rieslingtrocken/g, 'Riesling trocken'],
-    [/Rieslingdry/g, 'Riesling dry'],
-    [/ThörnicherRiesling/g, 'Thörnicher Riesling'],
-    [/ThornicherRiesling/g, 'Thörnicher Riesling'],
-    [/ThörnicherRitschRiesling/g, 'Thörnicher Ritsch Riesling'],
-    [/RuppertsbergerRiesling/g, 'Ruppertsberger Riesling'],
-    [/DeidesheimerRiesling/g, 'Deidesheimer Riesling'],
-    [/DeidesheimRiesling/g, 'Deidesheim Riesling'],
-    [/WachenheimerRiesling/g, 'Wachenheimer Riesling'],
-    [/RecherHerrenbergSpätburgunder/g, 'Recher Herrenberg Spätburgunder'],
-    [/RecherHerrenbergSpatburgunder/g, 'Recher Herrenberg Spätburgunder'],
-    [/Leiselheim Chardonnay trocken -SchwarzeErde-/g, 'Leiselheim Chardonnay trocken - Schwarze Erde -'],
-    [/EscherndorferAmLumpen/g, 'Escherndorfer Am Lumpen'],
-    [/EscherndorfSilvaner/g, 'Escherndorf Silvaner'],
-  ];
-
-  let next = value.normalize('NFC');
-  replacements.forEach(([pattern, replacement]) => {
-    next = next.replace(pattern, replacement);
-  });
-
-  return next
-    .replace(/([a-zäöüß])([A-ZÄÖÜ])/g, '$1 $2')
-    .replace(/([A-Za-zÄÖÜäöüß])trocken\b/g, '$1 trocken')
-    .replace(/([A-Za-zÄÖÜäöüß])brut\b/g, '$1 brut')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s+([）\)])/g, '$1')
-    .replace(/([（\(])\s+/g, '$1')
-    .trim();
-}
-
-function normalizeCopyKey(value: string) {
-  return value
-    .normalize('NFKD')
-    .toLowerCase()
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[–—-]/g, '-')
-    .replace(/[”“„‟"']/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-const wineryCopyKeyMap = {
-  landerer: 'landerer',
-  bus: 'bus',
-  salwey: 'salwey',
-  dautel: 'dautel',
-  horst: 'horstSauer',
-  ludwig: 'ludwig',
-  stodden: 'jeanStodden',
-  hamm: 'hamm',
-  buerklinwolf: 'burklinWolf',
-} as const;
-
-const wineTitleAliases: Partial<Record<string, string[]>> = {
-  'landerer::2023 Leiselheim Chardonnay trocken - Schwarze Erde -': [
-    '2023 Leiselheim Chardonnay trocken – Schwarze Erde –',
-  ],
-  'bus::2016 Dornfelder trocken In der Holle': ['2016 Dornfelder trocken "In der Hölle"'],
-  'dautel::2023 Spätburgunder trocken': ['2023 Spätburgunder VDP.Gutswein'],
-  'horst::2024 Escherndorf Silvaner trocken': ['2024 Escherndorfer Silvaner trocken VDP.Ortswein'],
-  'ludwig::NV Riesling Sekt Brut': ['NV Riesling brut Sekt'],
-  'stodden::2014 Recher Herrenberg Spätburgunder trocken': ['2014 Recher Herrenberg Spätburgunder'],
-  'stodden::2022 Spätburgunder Blanc de Noir trocken': ['2022 Blanc de Noir'],
-};
-
-function getWineCardCopy(
-  wineryId: keyof typeof wineryCopyKeyMap | string,
-  displayTitle: string,
-  fallbackWineDescription: string,
-  fallbackSoilDescription: string
-) {
-  const copyGroupKey = wineryCopyKeyMap[wineryId as keyof typeof wineryCopyKeyMap];
-  if (!copyGroupKey) {
-    return {
-      wineDescription: fallbackWineDescription,
-      soilDescription: fallbackSoilDescription,
-    };
-  }
-
-  const group = wineCardCopy[copyGroupKey];
-  const aliasKey = `${wineryId}::${displayTitle}`;
-  const candidateTitles = [displayTitle, ...(wineTitleAliases[aliasKey] ?? [])];
-
-  for (const candidateTitle of candidateTitles) {
-    const normalizedCandidate = normalizeCopyKey(candidateTitle);
-    const match = Object.entries(group).find(
-      ([title]) => normalizeCopyKey(title) === normalizedCandidate
-    );
-
-    if (match) {
-      const [, copy] = match;
-      return copy;
-    }
-  }
-
-  return {
-    wineDescription: fallbackWineDescription,
-    soilDescription: fallbackSoilDescription,
-  };
-}
-
-function getWineSoilCopy(
-  wineryId: keyof typeof wineryCopyKeyMap | string,
-  displayTitle: string,
-  fallbackSoilDescription: string
-) {
-  const copyGroupKey = wineryCopyKeyMap[wineryId as keyof typeof wineryCopyKeyMap];
-  if (!copyGroupKey) {
-    return fallbackSoilDescription;
-  }
-
-  const group = wineSoilCopy[copyGroupKey];
-  const aliasKey = `${wineryId}::${displayTitle}`;
-  const candidateTitles = [displayTitle, ...(wineTitleAliases[aliasKey] ?? [])];
-
-  for (const candidateTitle of candidateTitles) {
-    const normalizedCandidate = normalizeCopyKey(candidateTitle);
-    const match = Object.entries(group).find(
-      ([title]) => normalizeCopyKey(title) === normalizedCandidate
-    );
-
-    if (match) {
-      return match[1];
-    }
-  }
-
-  return fallbackSoilDescription;
 }
 
 const groupedWineList = Array.from(
@@ -347,6 +181,56 @@ export default function WineListSection() {
           </section>
         ))}
       </div>
+
+      <section className="mt-16 pb-8 sm:pb-10">
+        <div className="relative isolate overflow-hidden rounded-[28px] border border-[rgba(128,104,74,0.16)] bg-[linear-gradient(180deg,rgba(252,247,239,0.98)_0%,rgba(246,239,229,0.95)_58%,rgba(241,232,220,0.9)_100%)] px-6 py-8 shadow-[0_1px_0_rgba(255,255,255,0.76)_inset,0_16px_34px_rgba(18,16,14,0.045)] sm:px-7 sm:py-9 lg:px-8 lg:py-10">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-[1px] rounded-[27px] border border-[rgba(255,255,255,0.24)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[82%] bg-[radial-gradient(circle_at_18%_0%,rgba(214,192,160,0.18),rgba(214,192,160,0.06)_34%,rgba(214,192,160,0)_74%)]"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-[18%] h-44 w-44 translate-x-1/3 rounded-full bg-[radial-gradient(circle,rgba(201,182,154,0.14),rgba(201,182,154,0.06)_42%,rgba(201,182,154,0)_78%)] blur-3xl"
+          />
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute right-[12%] top-[30%] h-20 w-20 rounded-full bg-[radial-gradient(circle,rgba(246,240,230,0.58),rgba(246,240,230,0.16)_44%,rgba(246,240,230,0)_78%)] blur-2xl"
+          />
+
+          <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(210px,0.72fr)] lg:items-center">
+            <div className="max-w-[56ch]">
+              <p className="m-0 text-[10px] font-medium uppercase tracking-[0.28em] text-[rgba(31,27,22,0.5)]">NEXT STEP</p>
+              <h2 className="mt-3 max-w-[18ch] font-[var(--font-noto-serif-jp)] text-[clamp(1.9rem,3vw,2.5rem)] leading-[1.2] text-[rgba(18,16,14,0.98)]">
+                <span className="block whitespace-nowrap">導入のご相談・ご提案を</span>
+                <span className="block">ご希望の方へ</span>
+              </h2>
+              <p className="mt-4 max-w-[54ch] text-[14px] leading-[1.95] text-[rgba(31,27,22,0.74)]">
+                店の世界観、価格帯、料理構成に合わせて、導入しやすいラインアップをご提案します。まずはご希望の方向性をお聞かせください。
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1 lg:justify-self-start lg:self-center lg:pl-6">
+              <Link
+                href="/#contact-final"
+                scroll={false}
+                className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(79,59,38,0.18)] bg-[linear-gradient(180deg,rgba(92,71,48,0.98)_0%,rgba(69,52,35,0.98)_100%)] px-5.5 py-2.5 text-[11.5px] font-semibold tracking-[0.08em] text-[rgba(255,251,245,0.98)] shadow-[0_1px_0_rgba(255,255,255,0.12)_inset,0_8px_18px_rgba(48,34,21,0.14)] transition-colors hover:bg-[linear-gradient(180deg,rgba(100,77,52,1)_0%,rgba(75,56,37,1)_100%)]"
+              >
+                導入相談
+              </Link>
+              <Link
+                href="/#contact-final"
+                className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(31,27,22,0.18)] bg-[rgba(255,255,255,0.68)] px-5 py-2.5 text-[11.5px] font-semibold tracking-[0.08em] text-[rgba(31,27,22,0.88)] shadow-[0_1px_0_rgba(255,255,255,0.3)_inset] transition-colors hover:bg-[rgba(255,255,255,0.82)]"
+              >
+                資料請求
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
   );
 }

@@ -992,18 +992,6 @@ export default function CatalogueSection() {
               {renderWineryCardCopy(winery.id)}
             </div>
 
-            <div className="winery-card-footer winery-card__footer">
-              <span className="winery-card__orderLabel" aria-hidden="true">取引開始順</span>
-              {winery.ideelogosUrl ? (
-                <a href={winery.ideelogosUrl} className="winery-more-link winery-card__detailLink">
-                  ワイナリー詳細
-                </a>
-              ) : (
-                <span className="winery-more-link winery-card__detailLink" aria-disabled="true">
-                  ワイナリー詳細
-                </span>
-              )}
-            </div>
           </article>
         )})}
       </div>
