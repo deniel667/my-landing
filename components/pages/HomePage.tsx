@@ -3,14 +3,7 @@
 import { useEffect } from 'react';
 import { site } from '@/data/my-landing/site';
 import HeroSection from '@/components/sections/HeroSection';
-import AboutSection from '@/components/AboutSection';
-import NorenSlitDivider from '@/components/NorenSlitDivider';
-import PhilosophySection from '@/components/sections/PhilosophySection';
-import NorenNetworkSection from '@/components/sections/NorenNetworkSection';
-import TrustSection from '@/components/sections/TrustSection';
-import FoundationSection from '@/components/sections/FoundationSection';
 import ServiceSection from '@/components/sections/ServiceSection';
-import StorySection from '@/components/sections/StorySection';
 import CatalogueSection from '@/components/sections/CatalogueSection';
 import WinePreviewSection from '@/components/sections/WinePreviewSection';
 import VoiceSection from '@/components/sections/VoiceSection';
@@ -19,7 +12,6 @@ import ContactSection from '@/components/sections/ContactSection';
 import FooterSection from '@/components/sections/FooterSection';
 import Section from '@/components/Section';
 import SiteToast, { showSiteToast } from '@/components/ui/SiteToast';
-import { SHOW_TRUST } from '@/data/my-landing/featureFlags';
 
 export default function HomePage() {
   useEffect(() => {
@@ -131,51 +123,6 @@ export default function HomePage() {
   return (
     <main className="site-main">
       <HeroSection data={site.hero} />
-      <AboutSection />
-      <NorenSlitDivider id="slit-hero-philosophy" />
-      <section id="philosophy" className="relative w-full bg-[linear-gradient(180deg,#0f1012_0%,#16171a_100%)]">
-        <div className="relative h-[88px] lg:h-[120px]" aria-hidden="true">
-          <div
-            className="absolute inset-0 z-0"
-            style={{ background: 'linear-gradient(to bottom, var(--page-bg) 0%, rgba(0,0,0,0) 88%)' }}
-          />
-        </div>
-        <div className="relative z-10 mx-auto max-w-[1120px] px-6 py-16 sm:px-8 lg:px-12 lg:py-20">
-          <PhilosophySection />
-        </div>
-        <div className="relative h-[72px] lg:h-[96px]" aria-hidden="true">
-          <div
-            className="absolute inset-0 z-0"
-            style={{ background: 'linear-gradient(to top, var(--page-bg) 0%, rgba(0,0,0,0) 88%)' }}
-          />
-        </div>
-      </section>
-      <section id="noren-network" className="relative pt-8 pb-12 lg:pt-10 lg:pb-16">
-        <div className="mx-auto max-w-[1120px] px-6 sm:px-8 lg:px-12">
-          <div className="section-inner section-inner--tight top-rule pt-0">
-            <div className="section-content">
-              <NorenNetworkSection />
-            </div>
-          </div>
-        </div>
-      </section>
-      {SHOW_TRUST ? (
-        <Section id="rare" variant="full">
-          <TrustSection />
-        </Section>
-      ) : null}
-      <section id="foundation" className="layout-section">
-        <FoundationSection />
-      </section>
-      <section id="story" className="relative pt-8 pb-12 lg:pt-10 lg:pb-16">
-        <div className="mx-auto max-w-[1120px] px-6 sm:px-8 lg:px-12">
-          <div className="section-inner section-inner--tight top-rule pt-0">
-            <div className="section-content">
-              <StorySection />
-            </div>
-          </div>
-        </div>
-      </section>
       <section id="service" className="relative pt-8 pb-16 lg:pt-10 lg:pb-20">
         <div className="mx-auto max-w-[1120px] px-6 sm:px-8 lg:px-12">
           <div className="section-inner section-inner--tight top-rule pt-0">

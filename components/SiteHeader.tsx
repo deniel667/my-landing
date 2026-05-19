@@ -6,12 +6,10 @@ import { SHOW_TRUST } from '@/data/my-landing/featureFlags';
 
 const allNavItems = [
   { id: 'about', label: 'ABOUT', sectionId: 'about', href: '/#about' },
-  { id: 'philosophy', label: 'philosophy', sectionId: 'philosophy', href: '/#philosophy' },
-  { id: 'network', label: 'NETWORK', sectionId: 'noren-network', href: '/#noren-network' },
+  { id: 'background', label: '表現の背景', sectionId: null, href: '/background' },
   { id: 'trust', label: 'TRUST', sectionId: 'rare', href: '/#rare' },
-  { id: 'story', label: 'STORY', sectionId: 'story', href: '/#story' },
   { id: 'service', label: 'SERVICE', sectionId: 'service', href: '/#service' },
-  { id: 'wineries', label: 'WINERIES', sectionId: 'catalogue', href: '/#catalogue' },
+  { id: 'wineries', label: 'ワイナリー', sectionId: null, href: '/wineries' },
   { id: 'wines', label: 'WINES', sectionId: null, href: '/wines' },
   { id: 'contact', label: 'CONTACT', sectionId: 'contact', href: '/#contact' },
 ] as const;
@@ -151,7 +149,11 @@ export default function SiteHeader() {
           <div className="nav-links flex items-center gap-6">
             {navLinks.map(({ id, href, label, sectionId }) => {
               const isSectionLink = Boolean(sectionId);
-              const isActive = isSectionLink ? pathname === '/' && currentHash === sectionId : pathname === href;
+              const isActive = isSectionLink
+                ? pathname === '/' && currentHash === sectionId
+                : href === '/wineries'
+                  ? pathname.startsWith('/wineries')
+                  : pathname === href;
               return (
                 <a
                   key={href}
@@ -233,7 +235,11 @@ export default function SiteHeader() {
           <div className="site-mobile-links">
             {navLinks.map(({ id, href, label, sectionId }) => {
               const isSectionLink = Boolean(sectionId);
-              const isActive = isSectionLink ? pathname === '/' && currentHash === sectionId : pathname === href;
+              const isActive = isSectionLink
+                ? pathname === '/' && currentHash === sectionId
+                : href === '/wineries'
+                  ? pathname.startsWith('/wineries')
+                  : pathname === href;
               return (
                 <a
                   key={`mobile-${href}`}

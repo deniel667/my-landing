@@ -17,7 +17,7 @@ const tiers = [
   },
   {
     id: 'network-2',
-    axis: '② 共創パートナー',
+    axis: '② 共鳴パートナー',
     summary: 'ワインを卸すだけでなく、',
     condition: '「店や組織などの場の自分軸を可視化する」ことをサポート',
     form: '',
@@ -63,25 +63,7 @@ function PartnerTierCopy({ id }: { id: (typeof tiers)[number]['id'] }) {
   }
 
   if (id === 'network-3') {
-    return (
-      <div className="network-lines">
-        <p className="network-line">FINDESTは、既に独自のテーマやコミュニティを持つ方々と協働します。</p>
-        <p className="network-line">具体的には、イベント主催者、IR関係者、コミュニティオーナー、酒販店、問屋、等</p>
-        <ul className="network-case-intro-list">
-          <li>・既に自分の場を持っている</li>
-          <li>・自分の世界観がある</li>
-          <li>・審美眼がある</li>
-          <li>・選ぶ責任を引き受けている</li>
-          <li>・テーマを扱える</li>
-          <li>・人を集められる</li>
-          <li>・思想を伝播できる　等</li>
-        </ul>
-
-        <p className="network-line network-line-follow">FINDESTは本質を保ったまま、素材提供と共に、</p>
-        <p className="network-line">設計側の意図を、より響く形に調律します。</p>
-        <p className="network-line">この創造パートナーが伝えたいことを、ワインという別のアングルからのアプローチを加えることで、膨らみを持たせ魅力的にします。</p>
-      </div>
-    );
+    return null;
   }
 
   return null;

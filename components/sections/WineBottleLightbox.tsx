@@ -83,7 +83,7 @@ export default function WineBottleLightbox({
         type="button"
         onClick={() => setIsOpen(true)}
         className="relative block w-full overflow-hidden rounded-[16px] border border-[rgba(31,27,22,0.12)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(244,237,226,0.98)_100%)] px-5 py-3 text-left transition-shadow duration-200 hover:shadow-[0_10px_20px_rgba(31,27,22,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.36)]"
-        aria-label={`${alt} image`}
+        aria-label={`${alt} の画像`}
       >
         <div className="relative min-h-[126px]">
           <Image
@@ -103,7 +103,7 @@ export default function WineBottleLightbox({
                 type="button"
                 className="absolute inset-0 h-full w-full cursor-default bg-[rgba(19,16,13,0.66)] backdrop-blur-[4px]"
                 onClick={() => setIsOpen(false)}
-                aria-label="Close image overlay"
+                aria-label="画像を閉じる"
               />
 
               <div className="fixed inset-0 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
@@ -115,7 +115,7 @@ export default function WineBottleLightbox({
                     type="button"
                     onClick={() => setIsOpen(false)}
                     className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(31,27,22,0.1)] bg-[rgba(255,255,255,0.88)] text-[rgba(31,27,22,0.82)] transition-colors duration-200 hover:bg-[rgba(248,242,234,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.28)]"
-                    aria-label="Close image"
+                    aria-label="画像を閉じる"
                   >
                     <svg
                       aria-hidden="true"

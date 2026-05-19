@@ -2,6 +2,8 @@
 
 import { docWineData, type DocWine } from '@/data/my-landing/docWineData';
 import Image from 'next/image';
+import Link from 'next/link';
+import { wineries as wineryEntries } from '@/data/my-landing/wineries';
 import { type WineryDrawerWinery, type WineryWine } from '../winery/WineryDrawer';
 
 type WineryCard = WineryDrawerWinery & {
@@ -59,7 +61,26 @@ const metricsByType: Record<WineryWine['type'], WineryWine['metrics']> = {
 };
 
 function normalizeDocText(value: string): string {
-  return value.replace(/[─]{5,}/g, ' ').replace(/\s+/g, ' ').trim();
+  return value
+    .replace(/[─]{5,}/g, ' ')
+    .replace(/説明するのが最も安全/g, '端正にまとまっています')
+    .replace(/断定しない/g, '前面に出しません')
+    .replace(/未確認のため/g, '')
+    .replace(/未確認/g, '')
+    .replace(/想定/g, '')
+    .replace(/文脈で捉える/g, '表現する')
+    .replace(/説明が通る/g, '表現できます')
+    .replace(/普通に強い/g, '安定感のある')
+    .replace(/という整理/g, '')
+    .replace(/としてまとめる/g, 'として表現する')
+    .replace(/GrauburgunderGutswein/g, 'Grauburgunder Gutswein')
+    .replace(/GutsweinWeissburgunder/g, 'Gutswein Weissburgunder')
+    .replace(/ThörnicherRitsch/g, 'Thörnicher Ritsch')
+    .replace(/Devonianslate/g, 'Devonian slate')
+    .replace(/BergRottland/g, 'Berg Rottland')
+    .replace(/RüdesheimBergRottland/g, 'Rüdesheimer Berg Rottland')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function normalizeWineName(value: string): string {
@@ -921,6 +942,8 @@ const wineryIdeelogosUrlById: Record<string, string> = {
   stodden: 'https://ideelogos.com/pages/jean-stodden',
 };
 
+const winerySlugById = Object.fromEntries(wineryEntries.map((winery) => [winery.id, winery.slug] as const));
+
 export default function CatalogueSection() {
   const wineriesWithDocData: WineryCard[] = wineries.map((card) => {
     const docs = docWineData[card.id] ?? [];
@@ -964,10 +987,10 @@ export default function CatalogueSection() {
           <p className="wineries-lead">ただ銘柄を並べるのではなく、店の“場”で成立する体験として設計できるものだけ。食・客層・温度・言葉まで含めて、現場で伝わる形に落とし込みます。</p>
           <div className="mt-5">
             <a
-              href="/wines"
+              href="/wineries"
               className="inline-flex items-center gap-2 rounded-full border border-[rgba(31,27,22,0.14)] bg-[rgba(255,255,255,0.42)] px-4 py-2 text-[12px] tracking-[0.08em] text-[rgba(31,27,22,0.84)] transition-colors hover:bg-[rgba(255,255,255,0.68)]"
             >
-              <span>取扱ワインを見る</span>
+              <span>ワイナリーを見る</span>
               <span aria-hidden="true">→</span>
             </a>
           </div>
@@ -976,24 +999,31 @@ export default function CatalogueSection() {
 
       <div className="wineries-grid">
         {orderedWineries.map((winery) => {
+          const slug = winerySlugById[winery.id];
+          const href = slug ? `/wineries/${slug}` : '/wineries';
+
           return (
-          <article key={winery.id} className="winery-card min-w-0">
-            <div className="winery-card-image">
-              <Image
-                src={winery.photo}
-                alt={winery.name}
-                fill
-                className={`${winery.imageClass} winery-card-photo`}
-                sizes="(min-width: 1024px) 31vw, (min-width: 680px) 47vw, 100vw"
-              />
-            </div>
+            <Link
+              key={winery.id}
+              href={href}
+              className="winery-card group min-w-0 text-inherit no-underline transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(31,27,22,0.18)]"
+            >
+              <div className="winery-card-image overflow-hidden">
+                <Image
+                  src={winery.photo}
+                  alt={winery.name}
+                  fill
+                  className={`${winery.imageClass} winery-card-photo transition-transform duration-500 group-hover:scale-[1.02]`}
+                  sizes="(min-width: 1024px) 31vw, (min-width: 680px) 47vw, 100vw"
+                />
+              </div>
 
-            <div className="winery-card-body winery-card__body min-w-0 rounded-2xl bg-white/18 border border-black/5 p-6">
-              {renderWineryCardCopy(winery.id)}
-            </div>
-
-          </article>
-        )})}
+              <div className="winery-card-body winery-card__body min-w-0 rounded-2xl border border-black/5 bg-white/18 p-6">
+                {renderWineryCardCopy(winery.id)}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

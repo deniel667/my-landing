@@ -71,7 +71,7 @@ export default function StorySection() {
           <figure className="story-bottom-figure">
             <div className="story-bottom-media">
               <Image
-                src="/story/story-cellar-barrels-v2.jpg"
+                src="/story/wolf-1 (44).jpg"
                 alt="ワインボトルの棚"
                 fill
                 className="story-bottom-image object-cover"

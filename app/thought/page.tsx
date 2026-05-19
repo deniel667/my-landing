@@ -160,10 +160,10 @@ export default function ThoughtPage() {
               評価の前に、体感覚がある。
             </p>
             <a
-              href="/#philosophy"
+              href="/background"
               className="mt-4 inline-flex text-[12px] tracking-[0.08em] text-[rgba(22,20,18,0.68)] transition hover:text-[rgba(22,20,18,0.92)]"
             >
-              ← LPへ戻る
+              ← 表現の背景へ
             </a>
           </header>
 

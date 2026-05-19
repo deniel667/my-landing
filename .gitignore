@@ -41,3 +41,16 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+.env*.local
+
+# local backups / temp verification artifacts
+.backups/
+.tmp-*
+tmp_*
+tmp*.html
+verify-results.json
+build-full.log
+prod-start.log
+prod-start.err
+*.err
+.next-dev.log
