@@ -299,31 +299,31 @@ function WineCard({
 
       <div className="flex min-w-0 flex-col">
         <div className="flex items-start justify-between gap-3">
-          <p className="m-0 text-[10.5px] font-medium uppercase tracking-[0.18em] text-[rgba(38,32,25,0.62)]">{wine.producer}</p>
+          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.17em] text-[rgba(38,32,25,0.68)]">{wine.producer}</p>
           <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[9.5px] font-medium uppercase tracking-[0.14em] ${tone}`}>
             {toneKey}
           </span>
         </div>
 
-        <h2 className="mt-2 font-[var(--font-noto-serif-jp)] text-[21px] leading-[1.28] text-[rgba(23,20,17,0.98)]">
+        <h2 className="mt-2.5 font-[var(--font-noto-serif-jp)] text-[21px] leading-[1.28] text-[rgba(23,20,17,0.98)]">
           {wine.name}
         </h2>
 
-        <div className="mt-3 grid grid-cols-2 gap-2 text-[13px] leading-[1.55] text-[rgba(38,32,25,0.7)]">
+        <div className="mt-3.5 grid grid-cols-2 gap-2 text-[13.5px] leading-[1.6] text-[rgba(38,32,25,0.74)]">
           <div>
-            <span className="block text-[9px] uppercase tracking-[0.18em] text-[rgba(38,32,25,0.4)]">Vintage</span>
+            <span className="block text-[9.5px] uppercase tracking-[0.18em] text-[rgba(38,32,25,0.48)]">Vintage</span>
             {wine.vintage}
           </div>
           <div>
-            <span className="block text-[9px] uppercase tracking-[0.18em] text-[rgba(38,32,25,0.4)]">Style</span>
+            <span className="block text-[9.5px] uppercase tracking-[0.18em] text-[rgba(38,32,25,0.48)]">Style</span>
             {wine.style}
           </div>
         </div>
 
-        <p className="mt-4 line-clamp-3 text-[13px] leading-[1.8] text-[rgba(38,32,25,0.76)]">{wine.seasonalComment}</p>
+        <p className="mt-4 line-clamp-3 text-[13.5px] leading-[1.88] text-[rgba(38,32,25,0.82)]">{wine.seasonalComment}</p>
 
         <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-4">
-          <p className="m-0 font-[var(--font-noto-serif-jp)] text-[23px] leading-none text-[rgba(24,20,17,0.94)]">
+          <p className="m-0 font-[var(--font-noto-serif-jp)] text-[24px] leading-none text-[rgba(24,20,17,0.96)]">
             {wine.price}
             <span className="ml-1 text-[10px] font-sans tracking-[0.16em] text-[rgba(38,32,25,0.48)]">税抜</span>
           </p>
@@ -528,25 +528,27 @@ export default function JuneSelectionClient() {
 
         <section className="grid gap-4 md:grid-cols-2">
           {seasonalJuneWines.map((wine) => (
-            <div key={wine.key} className="contents">
-              <WineCard wine={wine} onInquiry={handleWineInquiry} onOpenDetails={handleOpenDetails} />
-              {wine.key === 'dautel-trollinger-2022' ? (
-                <PairingCard
-                  pair={seasonalJuneMerlotPair}
-                  onOpen={() => setIsMerlotPairOpen(true)}
-                  onInquiry={handleMerlotPairInquiry}
-                />
-              ) : null}
-            </div>
+            <WineCard key={wine.key} wine={wine} onInquiry={handleWineInquiry} onOpenDetails={handleOpenDetails} />
           ))}
+          <PairingCard
+            pair={seasonalJuneMerlotPair}
+            onOpen={() => setIsMerlotPairOpen(true)}
+            onInquiry={handleMerlotPairInquiry}
+          />
         </section>
 
         <section className="my-12 rounded-[8px] border border-[rgba(38,32,25,0.12)] bg-[rgba(255,255,255,0.42)] px-5 py-7 shadow-[0_12px_28px_rgba(32,26,18,0.035)] sm:my-16 sm:px-7 sm:py-8">
           <div className="grid gap-4 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start">
             <p className="m-0 text-[10.5px] font-medium uppercase tracking-[0.28em] text-[rgba(38,32,25,0.52)]">Seasonal View</p>
-            <p className="m-0 max-w-[70ch] font-[var(--font-noto-serif-jp)] text-[19px] leading-[1.9] text-[rgba(28,24,20,0.82)]">
-              {seasonalJuneSelection.editorial}
-            </p>
+            <div className="max-w-[70ch]">
+              <p className="m-0 font-[var(--font-noto-serif-jp)] text-[19px] leading-[1.9] text-[rgba(28,24,20,0.82)]">
+                {seasonalJuneSelection.editorial}
+              </p>
+              <p className="mt-5 border-t border-[rgba(38,32,25,0.1)] pt-4 text-[13.5px] leading-[1.9] text-[rgba(38,32,25,0.7)]">
+                気になるワインがございましたら、1本からでもお気軽にお問い合わせください。<br className="hidden sm:block" />
+                在庫とヴィンテージを確認のうえ、ご案内いたします。
+              </p>
+            </div>
           </div>
         </section>
 
@@ -618,7 +620,7 @@ export default function JuneSelectionClient() {
                 disabled={isSubmitting}
                 className="min-h-[48px] rounded-full border border-[rgba(66,48,31,0.18)] bg-[rgba(65,49,34,0.97)] px-5 py-3 text-[13px] font-medium tracking-[0.1em] text-[rgba(255,251,245,0.98)] shadow-[0_10px_22px_rgba(40,28,18,0.14)] transition-colors hover:bg-[rgba(78,58,39,0.98)] disabled:cursor-wait disabled:opacity-70"
               >
-                {isSubmitting ? '送信中です…' : 'この内容で注文・問い合わせ'}
+                {isSubmitting ? '送信中です…' : '初夏セレクションを注文・問い合わせる'}
               </button>
             </div>
           </div>
