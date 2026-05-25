@@ -36,9 +36,13 @@ function BottlePlaceholder() {
 export default function WineDetailModal({
   wineId,
   onClose,
+  inquiryButtonLabel,
+  onInquiry,
 }: {
   wineId: string | null;
   onClose: () => void;
+  inquiryButtonLabel?: string;
+  onInquiry?: () => void;
 }) {
   const wine = wineId ? wineShowcaseById.get(wineId) : null;
   const sourceWine = wineId ? wineList.find((item) => item.id === wineId) : null;
@@ -130,6 +134,16 @@ export default function WineDetailModal({
                   {wine.typeGrapeLine}
                 </span>
               </div>
+
+              {onInquiry ? (
+                <button
+                  type="button"
+                  onClick={onInquiry}
+                  className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[rgba(66,48,31,0.18)] bg-[rgba(65,49,34,0.97)] px-5 py-2.5 text-[12px] font-medium tracking-[0.1em] text-[rgba(255,251,245,0.98)] shadow-[0_10px_22px_rgba(40,28,18,0.14)] transition-colors hover:bg-[rgba(78,58,39,0.98)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.36)]"
+                >
+                  {inquiryButtonLabel ?? 'このワインを問い合わせる'}
+                </button>
+              ) : null}
 
               <div className="mt-6 space-y-4">
                 <section className="rounded-[18px] border border-[rgba(31,27,22,0.08)] bg-[rgba(255,255,255,0.58)] px-4 py-4">
