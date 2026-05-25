@@ -14,6 +14,31 @@ export type SeasonalJuneWine = {
   imageSrc: string | null;
 };
 
+export type SeasonalJunePairWine = {
+  key: string;
+  canonicalWineId: string | null;
+  producer: string;
+  name: string;
+  vintage: string;
+  style: string;
+  price: string;
+  wine: WineListItem | null;
+  imageSrc: string | null;
+};
+
+export type SeasonalJunePair = {
+  key: string;
+  eyebrow: string;
+  badge: string;
+  producer: string;
+  title: string;
+  comment: string;
+  modalBody: string;
+  ctaLabel: string;
+  inquiryText: string;
+  wines: SeasonalJunePairWine[];
+};
+
 type WineConfig = {
   key: string;
   wineryId: string;
@@ -64,7 +89,7 @@ const configs: WineConfig[] = [
     lookupName: '2018 JUST Secco Rosé',
     producer: 'Weingut Horst Sauer',
     name: 'JUST Secco Rosé',
-    vintage: '2018-2022',
+    vintage: '2018 / 2022',
     style: 'Sparkling Rosé',
     price: '5,200円',
     seasonalComment: '明るく軽快なロゼ・セッコ。アペリティフや季節の入口に提案しやすい一本です。',
@@ -86,7 +111,7 @@ const configs: WineConfig[] = [
     lookupName: '2017 Villa Bürklin Weißwein trocken',
     producer: 'Weingut Dr. Bürklin-Wolf',
     name: 'Villa Bürklin Weißwein trocken',
-    vintage: '2017-2018',
+    vintage: '2017 / 2018',
     style: 'White / Pfalz',
     price: '4,200円',
     seasonalComment: 'やわらかく親しみやすい白。和食や軽い前菜にも合わせやすい落ち着いた選択肢です。',
@@ -125,34 +150,12 @@ const configs: WineConfig[] = [
     seasonalComment: '赤でありながら軽快。温かい季節のグラスワインにも組み込みやすいスタイルです。',
   },
   {
-    key: 'bus-merlot-2019',
-    wineryId: 'bus',
-    lookupName: '2019 Merlot trocken',
-    producer: 'Weingut Bus',
-    name: 'Merlot trocken',
-    vintage: '2019',
-    style: 'Red / Merlot',
-    price: '5,800円',
-    seasonalComment: '丸みのある果実感とやわらかな口当たり。軽めの赤として幅広い料理に合わせやすい一本です。',
-  },
-  {
-    key: 'bus-merlot-blanc-2023',
-    wineryId: 'bus',
-    lookupName: '2023 Merlot Blanc de Noir trocken',
-    producer: 'Weingut Bus',
-    name: 'Merlot Blanc de Noir trocken',
-    vintage: '2023',
-    style: 'Blanc de Noir',
-    price: '4,900円',
-    seasonalComment: '赤品種由来のやわらかさを白の軽快さで。初夏の提案に使いやすいブラン・ド・ノワールです。',
-  },
-  {
     key: 'horst-domina-2016-2017',
     wineryId: 'horst',
     lookupName: '2016 Escherndorfer Domina trocken (BB)',
     producer: 'Weingut Horst Sauer',
     name: 'Escherndorfer Domina trocken',
-    vintage: '2016-2017',
+    vintage: '2016 / 2017',
     style: 'Red / Domina',
     price: '5,800円',
     seasonalComment: 'ほどよい構成を持つ赤。軽やかなラインナップの中で、料理に深みを添える役割です。',
@@ -183,3 +186,58 @@ export const seasonalJuneWines: SeasonalJuneWine[] = configs.map((config) => {
     imageSrc: wine ? getExactBottleImageSrc(wine.wineryId, wine.name) : null,
   };
 });
+
+function buildPairWine(config: Omit<WineConfig, 'seasonalComment'>): SeasonalJunePairWine {
+  const wine = findWine({ ...config, seasonalComment: '' });
+
+  return {
+    key: config.key,
+    canonicalWineId: wine?.id ?? null,
+    producer: config.producer,
+    name: config.name,
+    vintage: config.vintage,
+    style: config.style,
+    price: config.price,
+    wine,
+    imageSrc: wine ? getExactBottleImageSrc(wine.wineryId, wine.name) : null,
+  };
+}
+
+export const seasonalJuneMerlotPair: SeasonalJunePair = {
+  key: 'bus-merlot-two-bottle-selection',
+  eyebrow: 'SEASONAL PAIRING SET',
+  badge: '2 BOTTLE SELECTION',
+  producer: 'Weingut Bus',
+  title: 'Merlot 2本セレクション',
+  comment: '白仕立てと赤、Merlotの二つの表情を楽しむ初夏のセレクション。',
+  modalBody:
+    '白仕立てのMerlot Blanc de Noirと、やわらかな果実味を持つMerlot trocken。同じ品種の二つの表情を比べながら楽しめる、初夏の食卓に向けたセレクションです。前菜や魚介にはBlanc de Noir、軽い肉料理や炭火の香ばしさにはMerlot trockenと、食事の流れに合わせて提案しやすい組み合わせです。',
+  ctaLabel: 'この2本を問い合わせる',
+  inquiryText: [
+    'Weingut Bus / Merlot 2本セレクション',
+    '・Merlot Blanc de Noir trocken 2023　4,900円（税抜）× 1本',
+    '・Merlot trocken 2019　5,800円（税抜）× 1本',
+  ].join('\n'),
+  wines: [
+    buildPairWine({
+      key: 'bus-merlot-blanc-2023',
+      wineryId: 'bus',
+      lookupName: '2023 Merlot Blanc de Noir trocken',
+      producer: 'Weingut Bus',
+      name: 'Merlot Blanc de Noir trocken',
+      vintage: '2023',
+      style: 'Blanc de Noir',
+      price: '4,900円',
+    }),
+    buildPairWine({
+      key: 'bus-merlot-2019',
+      wineryId: 'bus',
+      lookupName: '2019 Merlot trocken',
+      producer: 'Weingut Bus',
+      name: 'Merlot trocken',
+      vintage: '2019',
+      style: 'Red / Merlot',
+      price: '5,800円',
+    }),
+  ],
+};
