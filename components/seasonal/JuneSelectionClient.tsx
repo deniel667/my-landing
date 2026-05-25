@@ -2,8 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { type KeyboardEvent, type MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { type KeyboardEvent, type MouseEvent, useMemo, useRef, useState } from 'react';
 import WineDetailModal from '@/components/wines/WineDetailModal';
 import SiteToast, { showSiteToast } from '@/components/ui/SiteToast';
 import {
@@ -11,6 +10,7 @@ import {
   seasonalJuneSelection,
   seasonalJuneWines,
   type SeasonalJunePair,
+  type SeasonalJunePairWine,
   type SeasonalJuneWine,
 } from '@/data/my-landing/seasonalJuneSelection';
 
@@ -38,150 +38,21 @@ function BottleFallback() {
   );
 }
 
-function PairingModal({
-  pair,
-  isOpen,
-  onClose,
-  onInquiry,
-}: {
-  pair: SeasonalJunePair;
-  isOpen: boolean;
-  onClose: () => void;
-  onInquiry: () => void;
-}) {
-  const portalTarget = typeof document === 'undefined' ? null : document.body;
+type SeasonalOfferWine = Pick<SeasonalJuneWine | SeasonalJunePairWine, 'producer' | 'name' | 'vintage'>;
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen || !portalTarget) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[170]" role="dialog" aria-modal="true" aria-label={pair.title}>
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute inset-0 h-full w-full bg-[rgba(19,16,13,0.54)] backdrop-blur-[5px]"
-        aria-label="閉じる"
-      />
-
-      <div className="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
-        <div
-          className="relative mx-auto w-full max-w-[980px] rounded-[30px] border border-[rgba(105,84,58,0.12)] bg-[linear-gradient(180deg,rgba(255,252,248,0.995)_0%,rgba(247,241,232,0.985)_100%)] p-5 shadow-[0_28px_80px_rgba(0,0,0,0.22)] sm:p-6 lg:p-7"
-          onClick={(event) => event.stopPropagation()}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[rgba(31,27,22,0.1)] bg-[rgba(255,255,255,0.88)] text-[rgba(31,27,22,0.82)] transition-colors duration-200 hover:bg-[rgba(248,242,234,1)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.28)]"
-            aria-label="閉じる"
-          >
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="h-[14px] w-[14px] shrink-0" fill="none">
-              <path d="M4 4l8 8M12 4 4 12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-            </svg>
-          </button>
-
-          <div className="grid gap-7 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)] lg:items-start">
-            <div className="rounded-[22px] border border-[rgba(105,84,58,0.08)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(250,245,238,0.98)_100%)] px-4 py-5">
-              <div className="grid grid-cols-2 gap-4">
-                {pair.wines.map((wine) => (
-                  <div key={wine.key} className="text-center">
-                    <div className="relative mx-auto h-[260px] max-w-[150px]">
-                      {wine.imageSrc ? (
-                        <Image
-                          src={wine.imageSrc}
-                          alt={`${wine.producer} ${wine.name}`}
-                          fill
-                          className="object-contain object-center"
-                          sizes="150px"
-                          priority
-                        />
-                      ) : (
-                        <BottleFallback />
-                      )}
-                    </div>
-                    <p className="mt-3 text-[12px] leading-[1.5] text-[rgba(31,27,22,0.78)]">{wine.name} {wine.vintage}</p>
-                    <p className="mt-1 font-[var(--font-noto-serif-jp)] text-[17px] text-[rgba(24,20,17,0.94)]">
-                      {wine.price}
-                      <span className="ml-1 text-[9px] font-sans tracking-[0.14em] text-[rgba(38,32,25,0.48)]">税抜</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.22em] text-[rgba(31,27,22,0.5)]">{pair.eyebrow}</p>
-              <h3 className="mt-3 font-[var(--font-noto-serif-jp)] text-[clamp(1.8rem,2.8vw,2.4rem)] leading-[1.22] text-[rgba(16,14,12,0.98)]">
-                {pair.title}
-              </h3>
-              <p className="mt-2 text-[13px] tracking-[0.06em] text-[rgba(31,27,22,0.68)]">{pair.producer}</p>
-              <p className="mt-5 text-[14px] leading-[1.95] text-[rgba(31,27,22,0.82)]">{pair.modalBody}</p>
-
-              <section className="mt-6 rounded-[18px] border border-[rgba(31,27,22,0.08)] bg-[rgba(255,255,255,0.58)] px-4 py-4">
-                <p className="text-[11px] tracking-[0.14em] text-[rgba(31,27,22,0.48)]">内容</p>
-                <div className="mt-3 grid gap-3">
-                  {pair.wines.map((wine) => (
-                    <div key={`modal-${wine.key}`} className="rounded-[14px] border border-[rgba(31,27,22,0.06)] bg-[rgba(255,255,255,0.62)] px-3 py-3">
-                      <p className="text-[13px] leading-[1.6] text-[rgba(31,27,22,0.82)]">{wine.name} {wine.vintage}</p>
-                      <p className="mt-1 font-[var(--font-noto-serif-jp)] text-[18px] text-[rgba(24,20,17,0.94)]">
-                        {wine.price}
-                        <span className="ml-1 text-[9px] font-sans tracking-[0.14em] text-[rgba(38,32,25,0.48)]">税抜</span>
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <button
-                type="button"
-                onClick={onInquiry}
-                className="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[rgba(66,48,31,0.18)] bg-[rgba(65,49,34,0.97)] px-5 py-2.5 text-[12px] font-medium tracking-[0.1em] text-[rgba(255,251,245,0.98)] shadow-[0_10px_22px_rgba(40,28,18,0.14)] transition-colors hover:bg-[rgba(78,58,39,0.98)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.36)]"
-              >
-                {pair.ctaLabel}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>,
-    portalTarget
-  );
-}
-
-function getSeasonalOfferLabel(wine: SeasonalJuneWine) {
+function getSeasonalOfferLabel(wine: SeasonalOfferWine) {
   return `${wine.producer} / ${wine.name} ${wine.vintage}`;
 }
 
 function PairingCard({
   pair,
-  onOpen,
+  onOpenWine,
   onInquiry,
 }: {
   pair: SeasonalJunePair;
-  onOpen: () => void;
+  onOpenWine: (wine: SeasonalJunePairWine) => void;
   onInquiry: () => void;
 }) {
-  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    onOpen();
-  };
-
   const handleInquiryClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onInquiry();
@@ -189,23 +60,24 @@ function PairingCard({
 
   return (
     <article
-      role="button"
-      tabIndex={0}
-      aria-label={`${pair.title} の詳細を見る`}
-      onClick={onOpen}
-      onKeyDown={handleKeyDown}
-      className="group grid h-full cursor-pointer gap-6 rounded-[8px] border border-[rgba(92,68,43,0.18)] bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(249,244,236,0.76)_100%)] p-5 shadow-[0_20px_46px_rgba(32,26,18,0.07)] transition duration-200 hover:-translate-y-[1px] hover:border-[rgba(89,65,42,0.26)] hover:bg-[rgba(255,255,255,0.88)] hover:shadow-[0_24px_54px_rgba(32,26,18,0.09)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.34)] md:col-span-2 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1fr)] md:p-6"
+      className="grid h-full gap-6 rounded-[8px] border border-[rgba(92,68,43,0.18)] bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(249,244,236,0.76)_100%)] p-5 shadow-[0_20px_46px_rgba(32,26,18,0.07)] transition duration-200 hover:border-[rgba(89,65,42,0.24)] hover:bg-[rgba(255,255,255,0.86)] hover:shadow-[0_24px_54px_rgba(32,26,18,0.08)] md:col-span-2 md:grid-cols-[minmax(0,0.92fr)_minmax(0,1fr)] md:p-6"
     >
       <div className="grid grid-cols-2 gap-4 rounded-[8px] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(246,240,230,0.62))] px-4 py-4">
         {pair.wines.map((wine) => (
-          <div key={wine.key} className="min-w-0 text-center">
+          <button
+            key={wine.key}
+            type="button"
+            onClick={() => onOpenWine(wine)}
+            className="group/wine min-w-0 rounded-[8px] px-2 py-2 text-center transition duration-200 hover:bg-[rgba(255,255,255,0.58)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(140,112,78,0.34)]"
+            aria-label={`${wine.producer} ${wine.name} ${wine.vintage} の詳細を見る`}
+          >
             <div className="relative mx-auto h-[178px] max-w-[120px] sm:h-[210px]">
               {wine.imageSrc ? (
                 <Image
                   src={wine.imageSrc}
                   alt={`${wine.producer} ${wine.name}`}
                   fill
-                  className="object-contain object-center transition-transform duration-300 group-hover:scale-[1.02]"
+                  className="object-contain object-center transition-transform duration-300 group-hover/wine:scale-[1.025]"
                   sizes="(min-width: 768px) 120px, 36vw"
                 />
               ) : (
@@ -218,7 +90,10 @@ function PairingCard({
               {wine.price}
               <span className="ml-1 text-[9px] font-sans tracking-[0.14em] text-[rgba(38,32,25,0.48)]">税抜</span>
             </p>
-          </div>
+            <span className="mt-2 inline-flex text-[10px] uppercase tracking-[0.16em] text-[rgba(38,32,25,0.46)] transition-colors group-hover/wine:text-[rgba(65,49,34,0.72)]">
+              詳細を見る
+            </span>
+          </button>
         ))}
       </div>
 
@@ -350,8 +225,7 @@ export default function JuneSelectionClient() {
   const [quantity, setQuantity] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeSeasonalWine, setActiveSeasonalWine] = useState<SeasonalJuneWine | null>(null);
-  const [isMerlotPairOpen, setIsMerlotPairOpen] = useState(false);
+  const [activeSeasonalWine, setActiveSeasonalWine] = useState<SeasonalJuneWine | SeasonalJunePairWine | null>(null);
 
   const allWineNames = useMemo(
     () => seasonalJuneWines.map(getSeasonalOfferLabel).join('\n'),
@@ -388,13 +262,13 @@ export default function JuneSelectionClient() {
     }, 0);
   };
 
-  const handleWineInquiry = (wine: SeasonalJuneWine) => {
+  const handleWineInquiry = (wine: SeasonalOfferWine) => {
     setActiveSeasonalWine(null);
     focusForm(getSeasonalOfferLabel(wine));
     showSiteToast('ご希望ワインをフォームに反映しました。', 'info');
   };
 
-  const handleOpenDetails = (wine: SeasonalJuneWine) => {
+  const handleOpenDetails = (wine: SeasonalJuneWine | SeasonalJunePairWine) => {
     if (!wine.canonicalWineId) {
       handleWineInquiry(wine);
       return;
@@ -404,7 +278,7 @@ export default function JuneSelectionClient() {
   };
 
   const handleMerlotPairInquiry = () => {
-    setIsMerlotPairOpen(false);
+    setActiveSeasonalWine(null);
     focusForm(seasonalJuneMerlotPair.inquiryText);
     showSiteToast('Merlot 2本セレクションをフォームに反映しました。', 'info');
   };
@@ -532,7 +406,7 @@ export default function JuneSelectionClient() {
           ))}
           <PairingCard
             pair={seasonalJuneMerlotPair}
-            onOpen={() => setIsMerlotPairOpen(true)}
+            onOpenWine={handleOpenDetails}
             onInquiry={handleMerlotPairInquiry}
           />
         </section>
@@ -643,12 +517,6 @@ export default function JuneSelectionClient() {
         onClose={() => setActiveSeasonalWine(null)}
         inquiryButtonLabel="このワインを問い合わせる"
         onInquiry={activeSeasonalWine ? () => handleWineInquiry(activeSeasonalWine) : undefined}
-      />
-      <PairingModal
-        pair={seasonalJuneMerlotPair}
-        isOpen={isMerlotPairOpen}
-        onClose={() => setIsMerlotPairOpen(false)}
-        onInquiry={handleMerlotPairInquiry}
       />
     </main>
   );
