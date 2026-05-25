@@ -284,7 +284,7 @@ export default function JuneSelectionClient() {
   };
 
   const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent('FINDEST｜初夏のワインセレクション問い合わせ');
+    const subject = encodeURIComponent('【FINDEST 初夏セレクション】ご注文・お問い合わせ');
     const body = encodeURIComponent(
       [
         `お名前: ${name}`,
@@ -309,32 +309,34 @@ export default function JuneSelectionClient() {
     showSiteToast('送信中です…', 'info');
 
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${seasonalJuneSelection.supportEmail}`, {
+      const response = await fetch('/api/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
         body: JSON.stringify({
-          _subject: 'FINDEST｜初夏のワインセレクション問い合わせ',
-          _captcha: 'false',
-          type: '初夏のワインセレクション',
-          name: name.trim(),
-          company: company.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          requestedWine: requestedWine.trim(),
-          quantity: quantity.trim(),
-          message: message.trim(),
+          source: 'Private June Selection',
+          subject: '【FINDEST 初夏セレクション】ご注文・お問い合わせ',
+          replyTo: email.trim(),
+          fields: [
+            { label: 'お名前', value: name.trim() },
+            { label: '店舗名 / 会社名', value: company.trim() },
+            { label: 'メールアドレス', value: email.trim() },
+            { label: '電話番号', value: phone.trim() || '未入力' },
+            { label: 'ご希望ワイン / ご希望商品', value: requestedWine.trim() },
+            { label: 'ご希望本数 / 数量', value: quantity.trim() || '未入力' },
+            { label: '備考', value: message.trim() || '未入力' },
+          ],
         }),
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const result = (await response.json()) as { success?: string };
-      if (!result.success) throw new Error('submit failed');
+      const result = (await response.json()) as { ok?: boolean };
+      if (!result.ok) throw new Error('submit failed');
     } catch (error) {
       console.error(error);
-      showSiteToast('送信に失敗しました。メール送信ボタンをご利用ください。', 'error');
+      showSiteToast('送信できませんでした。メール送信ボタンをご利用ください。', 'error');
       setIsSubmitting(false);
       return;
     }
@@ -347,7 +349,7 @@ export default function JuneSelectionClient() {
     setRequestedWine('');
     setQuantity('');
     setMessage('');
-    showSiteToast('送信が完了しました。お問い合わせありがとうございます。', 'success');
+    showSiteToast('送信が完了しました。在庫とヴィンテージを確認のうえ、担当者よりご連絡いたします。', 'success');
   };
 
   return (

@@ -5,8 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import SiteHeader from '@/components/SiteHeader';
 import SiteToast, { showSiteToast } from '@/components/ui/SiteToast';
 
-const supportEmail = 'support@zato-trd.co.jp';
-
 type RequestMode = 'meeting' | 'ir_pdf';
 
 function CopyBlock({ text }: { text: string }) {
@@ -81,23 +79,24 @@ export default function CollaborationPartnerProofPage() {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const postToSupport = async (subject: string, body: Record<string, string>) => {
-    const response = await fetch(`https://formsubmit.co/ajax/${supportEmail}`, {
+  const postToSupport = async (payload: {
+    source: string;
+    subject: string;
+    replyTo: string;
+    fields: Array<{ label: string; value: string }>;
+  }) => {
+    const response = await fetch('/api/inquiry', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({
-        _subject: subject,
-        _captcha: 'false',
-        ...body,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const result = (await response.json()) as { success?: string };
-    if (!result.success) throw new Error('submit failed');
+    const result = (await response.json()) as { ok?: boolean };
+    if (!result.ok) throw new Error('submit failed');
   };
 
   const openModal = (mode: RequestMode) => {
@@ -116,12 +115,17 @@ export default function CollaborationPartnerProofPage() {
 
     const isMeeting = requestMode === 'meeting';
     try {
-      await postToSupport(isMeeting ? 'FINDEST｜IR面談依頼' : 'FINDEST｜IR概要資料請求', {
-        type: isMeeting ? '面談依頼' : 'IR概要資料請求',
-        name: name.trim(),
-        company: company.trim(),
-        email: email.trim(),
-        message: message.trim() || (isMeeting ? '面談希望' : '資料請求希望'),
+      await postToSupport({
+        source: 'Collaboration Partner Proof',
+        subject: isMeeting ? '【FINDEST WEB】IR面談依頼' : '【FINDEST WEB】IR概要資料請求',
+        replyTo: email.trim(),
+        fields: [
+          { label: '種別', value: isMeeting ? '面談依頼' : 'IR概要資料請求' },
+          { label: 'お名前', value: name.trim() },
+          { label: '会社名', value: company.trim() || '未入力' },
+          { label: 'メール', value: email.trim() },
+          { label: '内容', value: message.trim() || (isMeeting ? '面談希望' : '資料請求希望') },
+        ],
       });
     } catch (error) {
       console.error(error);

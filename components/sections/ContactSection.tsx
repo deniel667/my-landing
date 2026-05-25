@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { showSiteToast } from '../ui/SiteToast';
 
 const businessOptions = ['レストラン', 'バー', 'ホテル', '小売', 'その他'] as const;
-const supportEmail = 'support@zato-trd.co.jp';
-
 export default function ContactSection() {
   const [isOpen, setIsOpen] = useState(false);
   const [businessType, setBusinessType] = useState<(typeof businessOptions)[number]>('レストラン');
@@ -39,26 +37,27 @@ export default function ContactSection() {
     };
   }, []);
 
-  const postToSupport = async (subject: string, body: Record<string, string>) => {
-    const response = await fetch(`https://formsubmit.co/ajax/${supportEmail}`, {
+  const postToSupport = async (payload: {
+    source: string;
+    subject: string;
+    replyTo: string;
+    fields: Array<{ label: string; value: string }>;
+  }) => {
+    const response = await fetch('/api/inquiry', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      body: JSON.stringify({
-        _subject: subject,
-        _captcha: 'false',
-        ...body,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
 
-    const result = (await response.json()) as { success?: string };
-    if (!result.success) {
+    const result = (await response.json()) as { ok?: boolean };
+    if (!result.ok) {
       throw new Error('submit failed');
     }
   };
@@ -73,18 +72,23 @@ export default function ContactSection() {
     showSiteToast('送信中です…', 'info');
 
     try {
-      await postToSupport('FINDEST｜導入相談フォーム', {
-        type: '導入相談',
-        name: name.trim(),
-        company: company.trim(),
-        email: email.trim(),
-        businessType,
-        message: message.trim(),
+      await postToSupport({
+        source: 'Homepage Contact',
+        subject: '【FINDEST WEB】導入相談・お問い合わせ',
+        replyTo: email.trim(),
+        fields: [
+          { label: 'お名前', value: name.trim() },
+          { label: '会社名', value: company.trim() || '未入力' },
+          { label: 'メール', value: email.trim() },
+          { label: '業態', value: businessType },
+          { label: '内容', value: message.trim() },
+          { label: '資料希望の有無', value: 'なし' },
+        ],
       });
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
-      showSiteToast('送信に失敗しました。時間をおいて再度お試しください。', 'error');
+      showSiteToast('送信できませんでした。恐れ入りますが、時間をおいて再度お試しください。', 'error');
       return;
     }
 
@@ -94,7 +98,7 @@ export default function ContactSection() {
     setEmail('');
     setMessage('');
     setBusinessType('レストラン');
-    showSiteToast('送信が完了しました。お問い合わせありがとうございます。', 'success');
+    showSiteToast('送信が完了しました。内容を確認のうえ、担当者よりご連絡いたします。', 'success');
     window.setTimeout(() => {
       showSiteToast('担当者より1〜2営業日以内にご連絡いたします。', 'info');
     }, 650);
@@ -110,23 +114,28 @@ export default function ContactSection() {
     showSiteToast('資料請求を送信中です…', 'info');
 
     try {
-      await postToSupport('FINDEST｜資料請求（PDF）', {
-        type: '資料請求（PDF）',
-        name: name.trim(),
-        company: company.trim(),
-        email: email.trim(),
-        businessType,
-        message: message.trim() || '資料請求のみ',
+      await postToSupport({
+        source: 'Homepage Contact',
+        subject: '【FINDEST WEB】導入相談・お問い合わせ',
+        replyTo: email.trim(),
+        fields: [
+          { label: 'お名前', value: name.trim() },
+          { label: '会社名', value: company.trim() || '未入力' },
+          { label: 'メール', value: email.trim() },
+          { label: '業態', value: businessType },
+          { label: '内容', value: message.trim() || '資料請求のみ' },
+          { label: '資料希望の有無', value: 'あり（PDF）' },
+        ],
       });
     } catch (error) {
       console.error(error);
       setIsPdfSubmitting(false);
-      showSiteToast('資料請求の送信に失敗しました。時間をおいて再度お試しください。', 'error');
+      showSiteToast('送信できませんでした。恐れ入りますが、時間をおいて再度お試しください。', 'error');
       return;
     }
 
     setIsPdfSubmitting(false);
-    showSiteToast('資料請求の送信が完了しました。ありがとうございます。', 'success');
+    showSiteToast('送信が完了しました。内容を確認のうえ、担当者よりご連絡いたします。', 'success');
     window.setTimeout(() => {
       showSiteToast('担当者より1〜2営業日以内にご連絡いたします。', 'info');
     }, 650);
