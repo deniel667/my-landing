@@ -39,9 +39,15 @@ export default function ContactSection() {
 
   const postToSupport = async (payload: {
     source: string;
-    subject: string;
-    replyTo: string;
-    fields: Array<{ label: string; value: string }>;
+    name: string;
+    company: string;
+    email: string;
+    phone: string;
+    businessType: string;
+    products: string;
+    quantity: string;
+    notes: string;
+    requestsPdf: string;
   }) => {
     const response = await fetch('/api/inquiry', {
       method: 'POST',
@@ -74,16 +80,15 @@ export default function ContactSection() {
     try {
       await postToSupport({
         source: 'Homepage Contact',
-        subject: '【FINDEST WEB】導入相談・お問い合わせ',
-        replyTo: email.trim(),
-        fields: [
-          { label: 'お名前', value: name.trim() },
-          { label: '会社名', value: company.trim() || '未入力' },
-          { label: 'メール', value: email.trim() },
-          { label: '業態', value: businessType },
-          { label: '内容', value: message.trim() },
-          { label: '資料希望の有無', value: 'なし' },
-        ],
+        name: name.trim(),
+        company: company.trim(),
+        email: email.trim(),
+        phone: '',
+        businessType,
+        products: '',
+        quantity: '',
+        notes: message.trim(),
+        requestsPdf: 'なし',
       });
     } catch (error) {
       console.error(error);
@@ -116,16 +121,15 @@ export default function ContactSection() {
     try {
       await postToSupport({
         source: 'Homepage Contact',
-        subject: '【FINDEST WEB】導入相談・お問い合わせ',
-        replyTo: email.trim(),
-        fields: [
-          { label: 'お名前', value: name.trim() },
-          { label: '会社名', value: company.trim() || '未入力' },
-          { label: 'メール', value: email.trim() },
-          { label: '業態', value: businessType },
-          { label: '内容', value: message.trim() || '資料請求のみ' },
-          { label: '資料希望の有無', value: 'あり（PDF）' },
-        ],
+        name: name.trim(),
+        company: company.trim(),
+        email: email.trim(),
+        phone: '',
+        businessType,
+        products: '',
+        quantity: '',
+        notes: message.trim() || '資料請求のみ',
+        requestsPdf: 'あり（PDF）',
       });
     } catch (error) {
       console.error(error);

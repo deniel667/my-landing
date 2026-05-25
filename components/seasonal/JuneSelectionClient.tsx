@@ -317,17 +317,15 @@ export default function JuneSelectionClient() {
         },
         body: JSON.stringify({
           source: 'Private June Selection',
-          subject: '【FINDEST 初夏セレクション】ご注文・お問い合わせ',
-          replyTo: email.trim(),
-          fields: [
-            { label: 'お名前', value: name.trim() },
-            { label: '店舗名 / 会社名', value: company.trim() },
-            { label: 'メールアドレス', value: email.trim() },
-            { label: '電話番号', value: phone.trim() || '未入力' },
-            { label: 'ご希望ワイン / ご希望商品', value: requestedWine.trim() },
-            { label: 'ご希望本数 / 数量', value: quantity.trim() || '未入力' },
-            { label: '備考', value: message.trim() || '未入力' },
-          ],
+          name: name.trim(),
+          company: company.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          businessType: '',
+          products: requestedWine.trim(),
+          quantity: quantity.trim(),
+          notes: message.trim(),
+          requestsPdf: '',
         }),
       });
 
@@ -336,7 +334,7 @@ export default function JuneSelectionClient() {
       if (!result.ok) throw new Error('submit failed');
     } catch (error) {
       console.error(error);
-      showSiteToast('送信できませんでした。メール送信ボタンをご利用ください。', 'error');
+      showSiteToast('送信できませんでした。恐れ入りますが、「メールで送信する」よりお問い合わせください。', 'error');
       setIsSubmitting(false);
       return;
     }
