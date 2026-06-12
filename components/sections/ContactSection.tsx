@@ -4,7 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 import { showSiteToast } from '../ui/SiteToast';
 
 const businessOptions = ['レストラン', 'バー', 'ホテル', '小売', 'その他'] as const;
-export default function ContactSection() {
+const successMessage = '送信が完了しました。内容を確認のうえ、担当者よりご連絡いたします。';
+const errorMessage = '送信できませんでした。恐れ入りますが、時間をおいて再度お試しください。';
+
+type ContactSectionProps = {
+  source?: 'Homepage Contact' | 'Private June Selection';
+};
+
+export default function ContactSection({ source = 'Homepage Contact' }: ContactSectionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [businessType, setBusinessType] = useState<(typeof businessOptions)[number]>('レストラン');
   const [name, setName] = useState('');
@@ -68,9 +75,17 @@ export default function ContactSection() {
     }
   };
 
+  const resetForm = () => {
+    setName('');
+    setCompany('');
+    setEmail('');
+    setMessage('');
+    setBusinessType('レストラン');
+  };
+
   const handleSubmit = async () => {
     if (!name.trim() || !email.trim() || !message.trim()) {
-      showSiteToast('必須項目（お名前・メール・内容）を入力してください。', 'error');
+      showSiteToast('必須項目（お名前・メールアドレス・お問い合わせ内容）をご入力ください。', 'error');
       return;
     }
 
@@ -79,7 +94,7 @@ export default function ContactSection() {
 
     try {
       await postToSupport({
-        source: 'Homepage Contact',
+        source,
         name: name.trim(),
         company: company.trim(),
         email: email.trim(),
@@ -93,34 +108,27 @@ export default function ContactSection() {
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
-      showSiteToast('送信できませんでした。恐れ入りますが、時間をおいて再度お試しください。', 'error');
+      showSiteToast(errorMessage, 'error');
       return;
     }
 
     setIsSubmitting(false);
-    setName('');
-    setCompany('');
-    setEmail('');
-    setMessage('');
-    setBusinessType('レストラン');
-    showSiteToast('送信が完了しました。内容を確認のうえ、担当者よりご連絡いたします。', 'success');
-    window.setTimeout(() => {
-      showSiteToast('担当者より1〜2営業日以内にご連絡いたします。', 'info');
-    }, 650);
+    resetForm();
+    showSiteToast(successMessage, 'success');
   };
 
   const handlePdfRequest = async () => {
     if (!name.trim() || !email.trim()) {
-      showSiteToast('資料請求には「お名前」と「メール」を入力してください。', 'error');
+      showSiteToast('資料希望の送信には「お名前」と「メールアドレス」をご入力ください。', 'error');
       return;
     }
 
     setIsPdfSubmitting(true);
-    showSiteToast('資料請求を送信中です…', 'info');
+    showSiteToast('送信中です…', 'info');
 
     try {
       await postToSupport({
-        source: 'Homepage Contact',
+        source,
         name: name.trim(),
         company: company.trim(),
         email: email.trim(),
@@ -128,21 +136,19 @@ export default function ContactSection() {
         businessType,
         products: '',
         quantity: '',
-        notes: message.trim() || '資料請求のみ',
+        notes: message.trim() || '資料希望',
         requestsPdf: 'あり（PDF）',
       });
     } catch (error) {
       console.error(error);
       setIsPdfSubmitting(false);
-      showSiteToast('送信できませんでした。恐れ入りますが、時間をおいて再度お試しください。', 'error');
+      showSiteToast(errorMessage, 'error');
       return;
     }
 
     setIsPdfSubmitting(false);
-    showSiteToast('送信が完了しました。内容を確認のうえ、担当者よりご連絡いたします。', 'success');
-    window.setTimeout(() => {
-      showSiteToast('担当者より1〜2営業日以内にご連絡いたします。', 'info');
-    }, 650);
+    resetForm();
+    showSiteToast(successMessage, 'success');
   };
 
   return (
@@ -151,20 +157,22 @@ export default function ContactSection() {
         <div className="contactGrid">
           <div className="contactCopy">
             <div className="contactKicker">CONTACT</div>
-            <h2 className="section-title-mincho contactTitle break-keep hyphens-none [text-wrap:balance]">導入相談・お問い合わせ</h2>
+            <h2 className="section-title-mincho contactTitle break-keep hyphens-none [text-wrap:balance]">
+              導入相談・お問い合わせ
+            </h2>
             <p className="contactLead">
-              レストラン／ホテル／小売・法人向けに、導入提案・資料送付・試飲会のご相談を承ります。
+              商品のお取り扱い、業務用導入、試飲、在庫・ヴィンテージに関するご相談など、内容に応じてご案内いたします。
             </p>
 
             <ul className="contactPoints">
-              <li>目的・業態に合わせた提案</li>
-              <li>ラインナップ／価格帯の整理</li>
-              <li>資料（PDF）・テック情報の共有</li>
+              <li>導入先の業態やご用途に合わせたご提案</li>
+              <li>在庫・ヴィンテージ・資料共有のご相談</li>
+              <li>試飲やお取引開始に向けた初回相談</li>
             </ul>
 
             <div className="contactMeta">
-              <span className="metaPill">通常 1-2 営業日以内に返信</span>
-              <span className="metaPill">日本語／英語 対応</span>
+              <span className="metaPill">通常 1〜2 営業日以内にご返信</span>
+              <span className="metaPill">日本語 / English 対応</span>
             </div>
           </div>
 
@@ -174,7 +182,7 @@ export default function ContactSection() {
               <div className="panelSub">必要事項をご入力ください。</div>
             </div>
 
-            <div className="panelForm" role="form" aria-label="contact form">
+            <div className="panelForm" role="form" aria-label="導入相談・お問い合わせフォーム">
               <div className="fieldRow">
                 <label className="field">
                   <span className="label">お名前</span>
@@ -203,7 +211,7 @@ export default function ContactSection() {
 
               <div className="fieldRow">
                 <label className="field">
-                  <span className="label">メール</span>
+                  <span className="label">メールアドレス</span>
                   <input
                     className="input"
                     name="email"
@@ -225,7 +233,9 @@ export default function ContactSection() {
                     onClick={() => setIsOpen((prev) => !prev)}
                   >
                     <span>{businessType}</span>
-                    <span className="selectChevron" aria-hidden="true">▾</span>
+                    <span className="selectChevron" aria-hidden="true">
+                      ▾
+                    </span>
                   </button>
                   {isOpen ? (
                     <div className="selectMenu" role="listbox" aria-label="業態">
@@ -250,13 +260,13 @@ export default function ContactSection() {
               </div>
 
               <label className="field">
-                <span className="label">内容</span>
+                <span className="label">お問い合わせ内容</span>
                 <textarea
                   className="input textarea"
                   name="message"
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
-                  placeholder="例）導入検討中。価格帯は◯◯、スパークリング中心..."
+                  placeholder="例）業務用導入を検討しています。希望価格帯や資料送付について相談したいです。"
                 />
               </label>
 
@@ -264,12 +274,7 @@ export default function ContactSection() {
                 <button type="button" className="btnPrimary" onClick={handleSubmit} disabled={isSubmitting}>
                   {isSubmitting ? '送信中…' : '送信する'}
                 </button>
-                <button
-                  type="button"
-                  className="btnGhost"
-                  onClick={handlePdfRequest}
-                  disabled={isPdfSubmitting}
-                >
+                <button type="button" className="btnGhost" onClick={handlePdfRequest} disabled={isPdfSubmitting}>
                   {isPdfSubmitting ? '送信中…' : '資料を希望（PDF）'}
                 </button>
               </div>
