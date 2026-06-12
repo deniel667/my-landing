@@ -7,6 +7,8 @@
           <p className="brand-sub mt-1">German Wine Curation</p>
         </div>
         <div className="footer-links">
+          <a href="/contact#company">会社概要</a>
+          <a href="/contact#contact">お問い合わせ</a>
           <a href="https://www.instagram.com/findest_japan/" target="_blank" rel="noreferrer">Instagram</a>
         </div>
       </div>

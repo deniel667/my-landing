@@ -11,7 +11,7 @@ const allNavItems = [
   { id: 'service', label: 'SERVICE', sectionId: 'service', href: '/#service' },
   { id: 'wineries', label: 'ワイナリー', sectionId: null, href: '/wineries' },
   { id: 'wines', label: 'WINES', sectionId: null, href: '/wines' },
-  { id: 'contact', label: 'CONTACT', sectionId: 'contact', href: '/#contact' },
+  { id: 'contact', label: 'お問い合わせ', sectionId: null, href: '/contact' },
 ] as const;
 
 const navItems = SHOW_TRUST ? allNavItems : allNavItems.filter((item) => item.id !== 'trust');
